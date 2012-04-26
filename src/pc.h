@@ -3,7 +3,6 @@
 
 #include "analoginput.h"
 
-/*
 struct avnav {
 	char byte1;
 	char byte2;
@@ -11,6 +10,5 @@ struct avnav {
 
 avnav encode_avnav(int data);
 int decode_avnav(avnav data);
-*/
 
 #endif
