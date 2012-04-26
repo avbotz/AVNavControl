@@ -6,9 +6,17 @@
 GCC_BIN = 
 PROJECT = AVNavControl
 SRC_PATH = src/
-OBJ_PATH = build/
-OBJ_EXT = .o
-OBJECTS = $(SRC_PATH)imu.o $(SRC_PATH)pc.o $(SRC_PATH)avnavcontrol.o $(SRC_PATH)analoginput.o $(SRC_PATH)motor.o $(SRC_PATH)pid.o $(SRC_PATH)pid_library.o $(SRC_PATH)Kalman.o 
+OBJ_PATH = build/ # not used
+OBJ_EXT = .o # not used
+OBJECTS = $(SRC_PATH)imu.o \
+$(SRC_PATH)pc.o \
+$(SRC_PATH)avnavcontrol.o \
+$(SRC_PATH)analoginput.o \
+$(SRC_PATH)motor.o \
+$(SRC_PATH)pid.o \
+$(SRC_PATH)pid_library.o \
+$(SRC_PATH)global.o \
+$(SRC_PATH)Kalman.o
 
 SYS_OBJECTS = ./export/LPC1768/GCC_CS/startup_LPC17xx.o ./export/LPC1768/GCC_CS/sys.o ./export/LPC1768/GCC_CS/cmsis_nvic.o ./export/LPC1768/GCC_CS/core_cm3.o ./export/LPC1768/GCC_CS/system_LPC17xx.o 
 INCLUDE_PATHS = -I./export -I./export/LPC1768 -I./export/LPC1768/GCC_CS -I$(SRC_PATH)
@@ -24,7 +32,6 @@ ONLY_C_FLAGS = -std=gnu99
 ONLY_CPP_FLAGS = -std=gnu++98
 CC_SYMBOLS = -DTARGET_LPC1768 -DTOOLCHAIN_GCC_CS -DNDEBUG
 
-
 AS = $(GCC_BIN)arm-none-eabi-as
 
 LD = $(GCC_BIN)arm-none-eabi-gcc
@@ -39,15 +46,12 @@ clean:
 	rm -f $(PROJECT).bin $(PROJECT).elf $(OBJECTS)
 
 .s.o:
-	cd $(OBJ_PATH)
 	$(AS)  $(CC_FLAGS) $(CC_SYMBOLS) -o $@ $<
 
 .c.o:
-	cd $(OBJ_PATH)
 	$(CC)  $(CC_FLAGS) $(CC_SYMBOLS) $(ONLY_C_FLAGS)   $(INCLUDE_PATHS) -o $@ $<
 
 .cpp.o:
-	cd $(OBJ_PATH)
 	$(CPP) $(CC_FLAGS) $(CC_SYMBOLS) $(ONLY_CPP_FLAGS) $(INCLUDE_PATHS) -o $@ $<
 
 

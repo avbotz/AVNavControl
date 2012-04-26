@@ -4,7 +4,6 @@
 
 
 #include "analoginput.h"
-#include "avnavcontrol.h"
 #include "IMU.h"
 #include "motor.h"
 
