@@ -9,7 +9,6 @@
 #include "imu.h"
 #include "motor.h"
 #include "pid.h"
-#include "pc.h"
 
 extern void send_to_pc();
 void readIMU(), readPC(), sendPC();

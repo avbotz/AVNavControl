@@ -26,21 +26,31 @@ int decode_avnav(avnav data) {
 	return ((data.byte1 - 0x20) << 6) | (data.byte2 - 0x20);
 }
 
+// TODO: this function is UNTESTED
 void send_to_pc() {
-	// This is the buffer for the message that will be sent to the BeagleBoard.
-	// Format: 'h', AVNav-encoded data for heading,
-	//         'd', AVNav-encoded data for depth,
-	//         'p', AVNav-encoded data for pitch,
-	//         kill switch status (l is alive and k is dead),
-	//         '\n' to terminate the message.
-	// TODO: Make sure L means alive and K means dead.
-	char mes[] = "h__d__p___\n";
+	// Holds data while it's being moved around.
+	avnav avnav_temp;
 	
-	// TODO:
-	// get heading
-	// get depth
-	// get pressure
-	// get kill
+	// Construct the message to the BeagleBoard based on state of the sub.
+	// get heading value
+	avnav_temp = encode_avnav(calcH);
+	mes[1] = avnav_temp.byte1;
+	mes[2] = avnav_temp.byte2;
+	
+	// get depth (pressure sensor) value
+	avnav_temp = encode_avnav(pressure.getValueCalibrated());
+	mes[4] = avnav_temp.byte1;
+	mes[5] = avnav_temp.byte2;
+	
+	// get power (motor) value
+	avnav_temp = encode_avnav(desPower);
+	mes[7] = avnav_temp.byte1;
+	mes[8] = avnav_temp.byte2;
+	
+	// get kill switch value
+	// TODO: is this correct? I assume voltage on kill pin means alive.
+	mes[9] = kill.getValueThresh() ? 'k' : 'l';
+	
 	// print message to PC
+	pc.printf(mes);
 }
-
