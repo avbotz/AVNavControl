@@ -65,7 +65,7 @@ void IMU::parse(char* buf) {
 		//p_pc->printf("%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
 		char printtemp[75];
 		sprintf(printtemp, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
-		for (int i = 0; i < sizeof(printtemp)/sizeof(printtemp[0]); i++) {
+		for (unsigned int i = 0; i < sizeof(printtemp)/sizeof(printtemp[0]); i++) {
 			p_pc->putc(printtemp[i]);
 		} 
 				//calcHeading();
