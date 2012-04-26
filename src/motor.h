@@ -22,8 +22,6 @@
 class Motor {
 public:
 
-
-
 	Motor(int num_motors, int baud, PinName tx, PinName rx);
 	~Motor();
 	void send(); // send all motors' speeds to the controller
@@ -47,5 +45,7 @@ private:
 
 	char motors[12]; //The controller supports twelve motors. This array locally stores their speeds.
 };
+
+extern Motor motor;
 
 #endif

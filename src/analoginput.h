@@ -14,7 +14,7 @@ class AnalogInput {
 		AnalogIn* p_analog;
 };
 
-AnalogInput kill(p16, 0.5);
-AnalogInput pressure(p17, 0.5);
+extern AnalogInput kill;
+extern AnalogInput pressure;
 
 #endif

@@ -52,4 +52,6 @@ private:
 	int num;
 };
 
+extern IMU imu;
+
 #endif

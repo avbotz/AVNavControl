@@ -14,9 +14,7 @@
 extern void send_to_pc();
 void readIMU(), readPC(), sendPC();
 
-Serial pc(USBTX, USBRX); //tx, rx
-IMU imu(p9, p10, 57600, &pc);
-Motor motor(4, 9600, p13, p14);
+extern Serial pc;
 
 Ticker ticker_pc;
 
