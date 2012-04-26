@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<root>
+  <global/>
+  <data>
+    <created_ts>1334887976</created_ts>
+    <last_mod_ts>1334887976</last_mod_ts>
+    <is_archive>0</is_archive>
+    <is_published>0</is_published>
+    <is_svn>1</is_svn>
+    <is_module>1</is_module>
+    <is_lib>0</is_lib>
+    <url>http://mbed.org/projects/libraries/svn/mbed/export/trunk</url>
+    <rev>43</rev>
+    <url_full>http://mbed.org/projects/libraries/svn/mbed/export/trunk@43</url_full>
+  </data>
+</root>
