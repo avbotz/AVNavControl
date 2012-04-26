@@ -4,12 +4,18 @@
 
 
 #include "analoginput.h"
-#include "IMU.h"
+#include "imu.h"
 #include "motor.h"
 
 //analoginput.h
 AnalogInput kill(p16, 0.5f);
-AnalogInput pressure(p17, 0.5f);
+
+// TODO: adjust this calibration. it's almost certainly wrong. 100 is arbitrary.
+// Daniel's was depth = adc_buffer[ADC_PRESS] * 0.361904762 - 101.33333;
+// That was based on the dsPIC33FJ family's ADC converter.
+// Also he used linear regression to convert depth sensor voltage to feet
+// Adding 0.5 so that it rounds correctly.
+AnalogPressureSensor pressure(p17, 100.0f, 0.0f);
 
 
 //avnavcontrol.h
