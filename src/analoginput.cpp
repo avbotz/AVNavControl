@@ -37,3 +37,28 @@ int AnalogPressureSensor::getValueCalibrated() {
 	// We're adding 0.5 so that it rounds correctly when we truncate into an int.
 	return (int)(getValueRaw() * m + b + 0.5f);
 }
+
+AnalogKillSwitch::
+AnalogKillSwitch(PinName Vin, PinName Vout, float thresh) :
+AnalogInput(Vin, thresh) {
+	p_Vout = new AnalogOut(Vout);
+	p_Vout->write(1.0f); // 1.0 * 3.3 volts
+}
+AnalogKillSwitch::~AnalogKillSwitch() {
+	// TODO: does the AnalogOut class automatically change the voltage to 0 when
+	// it gets destroyed?
+	// p_Vout->write(0.0f);
+	if (p_Vout != NULL) {
+		delete p_Vout;
+	}
+}
+
+float AnalogKillSwitch::getValueRaw() {
+	// TODO: test this averaging code. Is it enough?
+	value = (AnalogInput::getValueRaw() + value) / 2;
+	return value;
+}
+
+bool AnalogKillSwitch::getValueThresh() {
+	return (value > threshold);
+}

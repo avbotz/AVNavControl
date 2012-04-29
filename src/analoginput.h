@@ -9,7 +9,7 @@ public:
 	~AnalogInput();
 	float getValueRaw();
 	bool getValueThresh();
-private:
+protected:
 	float threshold;
 	AnalogIn* p_analog;
 };
@@ -25,7 +25,21 @@ private:
 	float m, b;
 };
 
-extern AnalogInput kill;
+class AnalogKillSwitch : public AnalogInput {
+public:
+	AnalogKillSwitch(PinName Vin, PinName Vout, float thresh);
+	~AnalogKillSwitch();
+	
+	// These functions do averaging.
+	float getValueRaw();
+	bool getValueThresh();
+	
+private:
+	AnalogOut* p_Vout;
+	float value;
+};
+
+extern AnalogKillSwitch kill;
 extern AnalogPressureSensor pressure;
 
 #endif
