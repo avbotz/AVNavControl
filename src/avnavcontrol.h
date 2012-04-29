@@ -17,7 +17,7 @@ extern Serial pc;
 
 Ticker ticker_pc;
 
-bool killed = false;
+bool isAlive = false;
 bool PCreadable, PCsendable;
 
 DigitalOut led1(LED1),	// Kill status
