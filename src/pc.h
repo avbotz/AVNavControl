@@ -3,7 +3,7 @@
 
 #include <mbed.h>
 
-#include "analoginput.h"
+#include "analog.h"
 #include "pid.h"
 
 struct avnav {
@@ -22,6 +22,8 @@ void send_to_pc();
 //         kill switch status (l is dead and k is alive),
 //         '\n' to terminate the message.
 char mes[] = "h||d||p|||\n";
+#define MESSAGE_LENGTH (sizeof(mes)/sizeof(char))
+
 
 extern Serial pc;
 

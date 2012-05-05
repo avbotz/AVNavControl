@@ -76,7 +76,7 @@ void do_pid() {
 	//check imu data
 	//maybe get new compass reading
 	//char* test;
-	pc.printf("%g\r\n", gyrZ);
+	//pc.printf("%g\r\n", gyrZ);
 
 	//Daniel's code before just averaged the values below
 	// the weighted average is because if we take fAcc* to be the value in the middle of the

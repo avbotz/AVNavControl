@@ -11,7 +11,7 @@ OBJ_EXT = .o # not used
 OBJECTS = $(SRC_PATH)imu.o \
 $(SRC_PATH)pc.o \
 $(SRC_PATH)avnavcontrol.o \
-$(SRC_PATH)analoginput.o \
+$(SRC_PATH)analog.o \
 $(SRC_PATH)motor.o \
 $(SRC_PATH)pid.o \
 $(SRC_PATH)pid_library.o \

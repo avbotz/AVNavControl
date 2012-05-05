@@ -3,7 +3,7 @@
 //could cause problems due to multiple definitions if they are declared in header files
 
 
-#include "analoginput.h"
+#include "analog.h"
 #include "imu.h"
 #include "motor.h"
 
