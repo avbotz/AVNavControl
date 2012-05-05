@@ -29,8 +29,10 @@ int main() {
 	// upon serial from pc: set desired heading and desired depth
 
 	while (true) {
+		//print_serial(&pc, "hellllllllo\n\r");
 		led1 = isAlive = kill.getValueThresh();
-		if (isAlive) {
+		led2 = !led2;
+		if (true) {
 			imu.getData();
 			//pc.printf("got data\n\r");
 	

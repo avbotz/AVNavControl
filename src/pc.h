@@ -3,7 +3,7 @@
 
 #include <mbed.h>
 
-#include "analoginput.h"
+#include "analog.h"
 #include "pid.h"
 
 struct avnav {

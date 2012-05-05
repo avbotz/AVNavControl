@@ -71,7 +71,7 @@ void do_pid() {
 	//check imu data
 	//maybe get new compass reading
 	//char* test;
-	pc.printf("%g\r\n", gyrZ);
+	//pc.printf("%g\r\n", gyrZ);
 
 	fAccX = (fAccX + accX) / 2;
 	fAccX = (fAccX + accX) / 2;

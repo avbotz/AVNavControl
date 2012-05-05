@@ -52,7 +52,7 @@ void send_to_pc() {
 	mes[9] = kill.getValueThresh() ? 'k' : 'l';
 	
 	// print message to PC
-	if (pc.writable()) {
+	if (pc.writeable()) {
 		for (int i = 0; i < MESSAGE_LENGTH - 1; i++) {
 			pc.putc(mes[i]);
 		}

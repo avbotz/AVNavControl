@@ -1,4 +1,4 @@
-#include "analoginput.h"
+#include "analog.h"
 
 AnalogInput::AnalogInput(PinName pin, float thresh) {
 	threshold = thresh;
