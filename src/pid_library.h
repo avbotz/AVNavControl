@@ -15,7 +15,6 @@ public:
 	void scale_input();
 private:
 
-	float calculate_p();
 	float calculate_i();
 	float calculate_d();
 
@@ -37,9 +36,9 @@ private:
 	//the desired value
 	float _setpoint;
 
-	//the current process value, last, and second last
+	//the current process value and the one before
 	// Process value is the current state of the system. error = difference between process and setpoint
-	float _processValue, _last, _last2;
+	float _processValue, _last;
 
 	//the current integral term
 	float _integral;
