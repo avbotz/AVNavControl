@@ -22,7 +22,7 @@ void send_to_pc();
 //         kill switch status (l is dead and k is alive),
 //         '\n' to terminate the message.
 char mes[] = "h||d||p|||\n";
-#define MESSAGE_LENGTH = 12; //includes null character which i dont believe is printed
+#define MESSAGE_LENGTH (sizeof(mes)/sizeof(char))
 
 
 extern Serial pc;
