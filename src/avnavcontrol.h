@@ -5,10 +5,11 @@
 
 #include "mbed.h"
 
-#include "analoginput.h"
+#include "analog.h"
 #include "imu.h"
 #include "motor.h"
 #include "pid.h"
+#include "debug.h"
 
 extern void send_to_pc();
 void readIMU(), readPC(), sendPC();

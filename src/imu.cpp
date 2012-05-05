@@ -1,5 +1,6 @@
 #include "mbed.h"
 #include "imu.h"
+#include "debug.h"
 
 IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	p_pc = pc;
@@ -48,31 +49,24 @@ int IMU::buffer_find(char c) {
 
 // Checks data integrity of buffer, then stores the IMU values into variables.
 void IMU::parse(char* buf) {
-	/*if (buffer_find('$') != buffer_index && buffer_find('#') != buffer_index) {
-		// Replace '$' ',' '#' with space ' ' so that we can use stringstream
-		for (int i = 0; i < buffer_index; i++) {
-			if (buf[i] == '$' || buf[i] == ',' || buf[i] == '#') {
-				buf[i] = ' ';
-			}
-		} */
-		
-		// Parse out the numbers with sscanf
-		// TODO: sscanf returns stuff based on the parse's success. should we check for that?
-	p_device->scanf(buf, "$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", &accX, &accY, &accZ, &gyrX, &gyrY, &gyrZ, &magX, &magY, &magZ);
-	//p_pc->printf("%s\r\n", buf);
-		//stringstream ss(*buf);
-		//ss >> accX >> accY >> accZ >> gyrX >> gyrY >> gyrZ >> magX >> magY >> magZ;
-		//p_pc->printf("%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
-		char printtemp[75];
-		sprintf(printtemp, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
-		for (unsigned int i = 0; i < sizeof(printtemp)/sizeof(printtemp[0]); i++) {
-			p_pc->putc(printtemp[i]);
-		} 
-				//calcHeading();
-	//}
-	//else {
-	//	p_pc->printf("Bad parse!\n\r");
-	//}
+	buf[buffer_index] = '\0';
+	short temp[9];
+	// we <3 pointer arithmetic
+	if (sscanf(buf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8) == 9){
+		accX = temp[0];
+		accY = temp[1];
+		accZ = temp[2];
+		gyrX = temp[3];
+		gyrY = temp[4];
+		gyrZ = temp[5];
+		magX = temp[6];
+		magY = temp[7];
+		magZ = temp[8];
+	}
+
+	char printtemp[75];
+	sprintf(printtemp, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
+	print_serial(p_pc, printtemp);
 }
 
 
@@ -95,6 +89,7 @@ void IMU::attach(void (*fptr)(void)) {
 }
 
 void IMU::getData() {
+	//print_serial(p_pc, "hello");
 	//p_pc->printf("hi");
 	
 	if (IMUreadable) {
@@ -113,19 +108,12 @@ void IMU::getData() {
 			while (readable()) {
 
 				char c = getc();
-				p_pc->putc(c);
-				//if (c == '#')
-					//p_pc->printf("where the hell is my pound?\r\n");
-				//p_pc->printf("pushing\n\r");
 				buffer[buffer_index] = c;
 				buffer_index++;
-				//if (buffer_index == 75) buffer_index = 0;
-				//p_pc->printf("pushed char %d %c\n\r", buffer_index , c);
 				if (buffer[buffer_index - 1] == '#') {
 					parseNow = true;
 					break;
 				}
-				// p_pc->printf("__%d__", parseNow);
 			}
 		}
 
@@ -133,9 +121,7 @@ void IMU::getData() {
 	}
 	
 	if (parseNow) {
-		//p_pc->printf("calling parse\n\r");
 		parse(buffer);
-		//p_pc->printf("done parse\n\r");
 		
 		/*
 		 * IMU Calibration Code
