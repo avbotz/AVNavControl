@@ -168,6 +168,21 @@ void IMU::getData() {
 	}
 }
 
+void IMU::directAccess() {
+	NVIC_DisableIRQ(UART3_IRQn);
+	
+	p_pc->printf("Entering IMU direct access mode. To exit, you need to reset the mbed.\n\r");
+	
+	while (true) {
+		if (p_pc->readable()) {
+			p_device->putc(p_pc->getc());
+		}
+		if (p_device->readable()) {
+			p_pc->putc(p_device->getc());
+		}
+	}
+}
+
 void IMU::calcHeading() {
 	// returns arctan(y/x) in radians between -pi and pi
 	float h = atan2((float)magY, (float)magX);
