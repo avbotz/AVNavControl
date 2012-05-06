@@ -168,15 +168,20 @@ void IMU::getData() {
 	}
 }
 
+// Call to get direct (raw) access to the IMU when it screws itself up.
 void IMU::directAccess() {
+	// Disable the interrupt for reading from the IMU
 	NVIC_DisableIRQ(UART3_IRQn);
 	
 	p_pc->printf("Entering IMU direct access mode. To exit, you need to reset the mbed.\n\r");
 	
+	// Act as a passthrough between the IMU and the PC (BeagleBoard).
 	while (true) {
+		// Send a character from PC to IMU (if possible).
 		if (p_pc->readable()) {
 			p_device->putc(p_pc->getc());
 		}
+		// Send a character from IMU to PC (if possible).
 		if (p_device->readable()) {
 			p_pc->putc(p_device->getc());
 		}
