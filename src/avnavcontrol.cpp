@@ -123,6 +123,9 @@ int main() {
 					case '\e': // escape
 						manual = false;
 						break;
+					case '9':	// Act as a passthrough between IMU and PC
+						imu.directAccess();
+						break;
 					default:
 						pc.printf("Unrecognized command.\n\r");
 						break;
