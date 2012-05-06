@@ -4,6 +4,7 @@
 #include "mbed.h"
 #include <string>
 #include <sstream>
+#include "debug.h"
 
 #define SYNC_BYTE 255
 

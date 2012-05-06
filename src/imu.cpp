@@ -1,6 +1,5 @@
 #include "mbed.h"
 #include "imu.h"
-#include "debug.h"
 
 IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	p_pc = pc;
@@ -24,7 +23,6 @@ IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	for (int i = 0; i < 75; i++) {
 		buffer[i] = 0;
 	}
-		
 	p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
 }
 
@@ -49,10 +47,12 @@ int IMU::buffer_find(char c) {
 
 // Checks data integrity of buffer, then stores the IMU values into variables.
 void IMU::parse(char* buf) {
+	led3 = !led3;
 	buf[buffer_index] = '\0';
+	print_serial(p_pc, buf);
 	short temp[9];
 	// we <3 pointer arithmetic
-	if (sscanf(buf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8) == 9){
+	if (sscanf(buf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8)){
 		accX = temp[0];
 		accY = temp[1];
 		accZ = temp[2];
@@ -62,11 +62,12 @@ void IMU::parse(char* buf) {
 		magX = temp[6];
 		magY = temp[7];
 		magZ = temp[8];
+
 	}
 
 	char printtemp[75];
 	sprintf(printtemp, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
-	print_serial(p_pc, printtemp);
+	//print_serial(p_pc, printtemp);
 }
 
 
@@ -185,7 +186,7 @@ void IMU::calcHeading() {
 	}
 	
 	heading = (short)(h + 0.5f); // adding 0.5 so that it rounds instead of truncating.
-	p_pc->printf("calculated compass heading: %d\n\r", heading);
+	//p_pc->printf("calculated compass heading: %d\n\r", heading);
 	
 	
 	/*

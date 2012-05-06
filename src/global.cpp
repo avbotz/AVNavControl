@@ -27,3 +27,8 @@ IMU imu(p9, p10, 57600, &pc);
 
 //motor.h
 Motor motor(4, 9600, p13, p14);
+
+DigitalOut led1(LED1),	// Kill status
+           led2(LED2),	// 
+           led3(LED3),	// 
+           led4(LED4);	// 

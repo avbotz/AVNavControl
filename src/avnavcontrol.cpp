@@ -7,9 +7,13 @@ bool manual = false;
 
 unsigned char motorArray[4];
 
+Serial asdf(p28, p27);
+
 int main() {
 	// Set BeagleBoard's baud to 115200.
 	pc.baud(115200);
+	asdf.baud(9600);
+	asdf.format(8, Serial::None, 1);
 	// Attach a callback so that readIMU() is called when the IMU gets a character.
 	imu.attach(&readIMU);
 	// Set the motors to no power.
@@ -27,23 +31,31 @@ int main() {
 
 	// every 1s: send data to pc
 	// upon serial from pc: set desired heading and desired depth
-
+	//print_serial(&pc, "hi");
+	int i = 0;
 	while (true) {
-		//print_serial(&pc, "hellllllllo\n\r");
-		led1 = isAlive = kill.getValueThresh();
-		led2 = !led2;
+		//led1 = isAlive = kill.getValueThresh();
+		//led2 = !led2;
 		if (true) {
 			imu.getData();
 			//pc.printf("got data\n\r");
 	
+
+
 			if (!manual) {
 				give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
 				do_pid();
 				//pc.printf("Motor speeds:	");
-				for (int i = 0; i < 4; i++) {
-					//motor.set(i, motorArray[i]);
-					//pc.printf("%d\t", motorArray[i]);
-				}
+				motor.set(i, motorArray[i]);
+				i++;
+				if (i == 4) i = 0;
+				//for (int i = 0; i < 4; i++) {
+				//	sprintf(filler, "%d\t", motorArray[i]);
+				//	print_serial(&pc, filler);
+				//	motor.set(i, motorArray[i]);
+				//	pc.printf("%d\t", motorArray[i]);
+				//}
+				//print_serial(&pc, "\n\r");
 				//pc.printf("\n\r");
 			}
 	
@@ -143,6 +155,7 @@ int main() {
 				NVIC_EnableIRQ(UART0_IRQn);
 				//__enable_irq();
 			}
+			
 	
 		}
 		else {

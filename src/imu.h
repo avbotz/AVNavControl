@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <limits.h>
+#include "debug.h"
 
 class IMU {
 // TODO: Figure out which functions and variables can be private.

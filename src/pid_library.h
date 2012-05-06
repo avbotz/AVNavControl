@@ -2,6 +2,9 @@
 class PID
 {
 public:
+
+	//adjustments order: bias->bounds->scale
+
 	void setGains(float kp, float ki, float kd);
 	void setBounds(float inputMax, float inputMin);
 	void setScale(float inputScale);

@@ -98,7 +98,8 @@ void do_pid() {
 	//use the kalman filters on pitch and roll and just adjust heading
 	calcP = pitchK.calculate(gyrX, accP);
 	calcR = rollK.calculate(gyrY, accR);
-	calcH += (fGyrZ - MU_GYR_Z) * GYR_SCALE * DT;
+	//because positive is CCW for the IMU and we treat it as positive with motors
+	calcH += (MU_Z_GYR - fGyrZ) * GYR_SCALE * DT;
 
 	//360 degrees in a circle so we want our heading between 0 and 360
 	if (calcH >= 360) {
@@ -137,6 +138,7 @@ void do_pid() {
 		isMove = false;
 	}
 	float headError = dHC - calcH;
+	
 	headingPID->setProcessValue(headError);
 	
 	float depthError = desDepth - depth;
@@ -187,6 +189,8 @@ void update_motors(float hpid, float dpid, float ppid) {
 		motorSpeed[BACK] = -1.0f * dpid;
 	}
 	int powerNum[4];
+	motorSpeed[RIGHT] *= .85; //because the right motor is stronger
+	motorSpeed[BACK] *= -1;  //because the back motor is backwards
 	
 	//motorSpeed is a number around zero so the following scales them 0 - 254 which the motors require
 	for (int i = 0; i < 4; i++) {
@@ -203,9 +207,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 			powerNum[i] = 127;
 		}
 	}
-	
-	powerNum[RIGHT] *= 0.85f;   //because the right motor is stronger (i think)
-	powerNum[BACK] *= -1;	  //because the back motor is backwards  (i think)
+
 	motorArray[LEFT] = powerNum[LEFT];
 	motorArray[RIGHT] = powerNum[RIGHT];
 	motorArray[FRONT] = powerNum[FRONT];

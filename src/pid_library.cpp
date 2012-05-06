@@ -76,12 +76,12 @@ float PID::calculate_d()
 
 void PID::scale_input()
 {
-	if (_processValue > _inputMax) {
-		_scaledInput = (_inputMax + _bias) * _inputScale;
+	if (_processValue + _bias > _inputMax) {
+		_scaledInput = (_inputMax) * _inputScale;
 	}
 
 	else if (_processValue + _bias < _inputMin) {
-		_scaledInput = (_inputMin + _bias) * _inputScale;
+		_scaledInput = (_inputMin) * _inputScale;
 	}
 	else {
 		_scaledInput = (_processValue + _bias) * _inputScale;

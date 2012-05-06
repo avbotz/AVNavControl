@@ -32,9 +32,11 @@ void Motor::send() {
 void Motor::send(int i_motor) {
 	// format: {sync byte, motor id, motor power}
 	// example: {SSC_SYNC_BYTE, 2, 24} sets motor 2 to power level 24
+	//print_serial(p_device, "%c%c%c", SYNC_BYTE, (unsigned char)i_motor, motors[i_motor]);
 	p_device->putc(SYNC_BYTE);
 	p_device->putc((unsigned char)i_motor);
 	p_device->putc(motors[i_motor]);
+
 }
 
 void Motor::set(unsigned char value) {
