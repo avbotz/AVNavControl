@@ -129,10 +129,14 @@ int main() {
 						motor.set(BACK, 127);
 						break;
 					case 'i':
-						manual = true;
+						manual = false;
 						//print info and stuff
 						break;
 					case '\e': // escape
+						manual = false;
+						break;
+					case '9':	// Act as a passthrough between IMU and PC
+						imu.directAccess();
 						manual = false;
 						break;
 					default:
