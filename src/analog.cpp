@@ -18,7 +18,7 @@ float AnalogInput::getValueRaw() {
 }
 
 AnalogPressureSensor::AnalogPressureSensor(PinName pin, float calibration_m, float calibration_b) : 
-AnalogInput(pin, 0.5f) {
+AnalogInput(pin) {
 	m = calibration_m;
 	b = calibration_b;
 }
