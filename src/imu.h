@@ -19,6 +19,7 @@ public:
 	void attach(void (*fptr)(void));
 	void parse(char*);
 	void getData();
+	void directAccess();
 	void calcHeading();
 	
 	// ticks per degree, from <http://www.sparkfun.com/datasheets/Sensors/Gyro/PS-ITG-3200-00-01.4.pdf>
