@@ -47,16 +47,17 @@ int main() {
 				do_pid();
 				//pc.printf("Motor speeds:	");
 				motor.set(i, motorArray[i]);
+				
 				i++;
 				if (i == 4) i = 0;
-				//for (int i = 0; i < 4; i++) {
-				//	sprintf(filler, "%d\t", motorArray[i]);
-				//	print_serial(&pc, filler);
-				//	motor.set(i, motorArray[i]);
-				//	pc.printf("%d\t", motorArray[i]);
-				//}
-				//print_serial(&pc, "\n\r");
-				//pc.printf("\n\r");
+				for (int i = 0; i < 4; i++) {
+					sprintf(filler, "%d\t", motorArray[i]);
+					//print_serial(&pc, filler);
+					//motor.set(i, motorArray[i]);
+					pc.printf("%d\t", motorArray[i]);
+				}
+				print_serial(&pc, "\n\r");
+				pc.printf("\n\r");
 			}
 	
 			while (pc.readable()) {

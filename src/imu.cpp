@@ -47,9 +47,8 @@ int IMU::buffer_find(char c) {
 
 // Checks data integrity of buffer, then stores the IMU values into variables.
 void IMU::parse(char* buf) {
-	led3 = !led3;
 	buf[buffer_index] = '\0';
-	print_serial(p_pc, buf);
+	//print_serial(p_pc, buf);
 	short temp[9];
 	// we <3 pointer arithmetic
 	if (sscanf(buf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8)){
@@ -62,7 +61,7 @@ void IMU::parse(char* buf) {
 		magX = temp[6];
 		magY = temp[7];
 		magZ = temp[8];
-
+		led3 = !led3;
 	}
 
 	char printtemp[75];
