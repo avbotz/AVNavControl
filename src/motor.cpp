@@ -12,6 +12,12 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	p_device = new Serial(tx, rx); // (tx, rx) opens up new serial device (p_device is Serial* pointer)
 	p_device->format(8, Serial::None, 1);
 	p_device->baud(baud); // Set the baud.
+	
+	for (int i = 0; i < MOTOR_TX_BUF_SIZE; i++) {
+		buffer[i] = 0;
+	}
+	i_buffer_write = i_buffer_read = 0;
+	motor.buffer_empty = true;
 	set(127);   // The motors should start stationary (zero power)
 }
 
@@ -23,6 +29,19 @@ Motor::~Motor() {
 	}
 }
 
+void Motor::attach(void (*fptr)(void)) {
+	// Attach as a transmit interrupt only.
+	p_device->attach(fptr, Serial::TxIrq);
+}
+
+void Motor::putc(char c) {
+	buffer[i_buffer_write] = c;
+	NVIC_DisableIRQ(UART1_IRQn);
+	i_buffer_write = (i_buffer_write + 1) % MOTOR_TX_BUF_SIZE;
+	NVIC_EnableIRQ(UART1_IRQn);
+	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
+}
+
 void Motor::send() {
 	for (int i = 0; i < num_motors; i++) {
 		send(i);
@@ -31,11 +50,11 @@ void Motor::send() {
 
 void Motor::send(int i_motor) {
 	// format: {sync byte, motor id, motor power}
-	// example: {SSC_SYNC_BYTE, 2, 24} sets motor 2 to power level 24
-	print_serial(p_device, "%c%c%c", SYNC_BYTE, (unsigned char)i_motor, motors[i_motor]);
-	/*p_device->putc(SYNC_BYTE);
-	p_device->putc((unsigned char)i_motor);
-	p_device->putc(motors[i_motor]);*/
+	// example: {SYNC_BYTE, 2, 24} sets motor 2 to power level 24
+	
+	putc(SYNC_BYTE);
+	putc((unsigned char)i_motor);
+	putc(motors[i_motor]);
 }
 
 void Motor::set(unsigned char value) {
