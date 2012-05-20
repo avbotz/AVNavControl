@@ -16,8 +16,11 @@ int main() {
 	asdf.format(8, Serial::None, 1);
 	// Attach a callback so that readIMU() is called when the IMU gets a character.
 	imu.attach(&readIMU);
+	imu.p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
 	// Set the motors to no power.
 	motor.set(127);
+	// Attach a callback for sending the motor.
+	motor.attach(&sendMotor);
 	// Set an interrupt to send data to the BeagleBoard every 1.0 seconds.
 	ticker_pc.attach(&sendPC, 1.0);
 	//
@@ -40,24 +43,20 @@ int main() {
 			imu.getData();
 			//pc.printf("got data\n\r");
 	
-
+			led3 = !led3;
 
 			if (!manual) {
 				give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
 				do_pid();
 				//pc.printf("Motor speeds:	");
-				motor.set(i, motorArray[i]);
-				
-				i++;
-				if (i == 4) i = 0;
 				for (int i = 0; i < 4; i++) {
-					sprintf(filler, "%d\t", motorArray[i]);
-					//print_serial(&pc, filler);
-					//motor.set(i, motorArray[i]);
-					pc.printf("%d\t", motorArray[i]);
+					//sprintf(filler, "%d\t", motorArray[i]);
+					motor.set(i, motorArray[i]);
+					//pc.printf("%d\t", motorArray[i]);
 				}
-				print_serial(&pc, "\n\r");
-				pc.printf("\n\r");
+			}
+			if (motor.buffer_empty) {
+				sendMotor();
 			}
 	
 			while (pc.readable()) {
@@ -180,12 +179,39 @@ void readPC() {
 
 // This interrupt is called when there is a character to be read from the IMU.
 void readIMU() {
-	imu.IMUreadable = true;
-	NVIC_DisableIRQ(UART3_IRQn);
+	led2 = !led2;
+	
+	// TODO: it might be called and there are multiple characters to be read
+	while (imu.p_device->readable()) {
+		imu.buffer[imu.i_buffer_write] = imu.getc();
+		//pc.putc(imu.buffer[imu.i_buffer_write]);
+		NVIC_DisableIRQ(UART3_IRQn);
+		imu.i_buffer_write = (imu.i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
+		NVIC_EnableIRQ(UART3_IRQn);
+		if (imu.i_buffer_write == imu.i_buffer_read) {
+			imu.buffer_overflow = true;
+			NVIC_DisableIRQ(UART3_IRQn);
+			break;
+		}
+	}
 }
 
 void sendPC() {
 	//PCsendable = true;
 	//NVIC_DisableIRQ(TIMER3_IRQn);
 	//__disable_irq();
+}
+
+void sendMotor() {
+	while (motor.p_device->writeable() && motor.i_buffer_write != motor.i_buffer_read) {
+		motor.p_device->putc(motor.buffer[motor.i_buffer_read]);
+		motor.i_buffer_read = (motor.i_buffer_read + 1) % MOTOR_TX_BUF_SIZE;
+		motor.buffer_empty = false;
+	}
+	if (motor.i_buffer_write == motor.i_buffer_read) {
+		motor.buffer_empty = true;
+		NVIC_DisableIRQ(UART1_IRQn);
+		// if nothing to write, turn off the interrupt until motor.getc() is called again
+	}
+	
 }

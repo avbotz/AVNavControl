@@ -7,6 +7,8 @@
 #include <limits.h>
 #include "debug.h"
 
+#define IMU_RX_BUFFER_SIZE 1024
+
 class IMU {
 // TODO: Figure out which functions and variables can be private.
 public:
@@ -17,7 +19,7 @@ public:
 	char getc();
 	bool readable();
 	void attach(void (*fptr)(void));
-	void parse(char*);
+	void parse();
 	void getData();
 	void directAccess();
 	void calcHeading();
@@ -27,17 +29,17 @@ public:
 	static const float radToDeg = 57.29577951308232f; // equals 180/pi
 	
 	// Stores a line of raw data from the IMU
-	char buffer[1000];
-	int buffer_index;
-	int buffer_find(char c);
+	char buffer[IMU_RX_BUFFER_SIZE];
+	int i_buffer_read, i_buffer_write;
+	char linebuf[1024];
+	int i_linebuf;
+	bool buffer_overflow;
 	
 	short accX, accY, accZ, 
 		  gyrX, gyrY, gyrZ, 
 		  magX, magY, magZ;
 	unsigned short heading; // 0 to 359. current compass heading set by calcHeading()
 	
-	bool IMUreadable;
-	bool PCreadable;
 	bool parseNow;
 	bool debugMode;
 	
