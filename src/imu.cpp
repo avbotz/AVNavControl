@@ -16,14 +16,22 @@ IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	}
 	
 	accX = accY = accZ = gyrX = gyrY = gyrZ = magX = magY = magZ = 0;
-	parseNow = PCreadable = IMUreadable = false;
+	parseNow = false;
 	
 	debugMode = false;
 	
-	for (int i = 0; i < 75; i++) {
+	for (int i = 0; i < IMU_RX_BUFFER_SIZE; i++) {
 		buffer[i] = 0;
 	}
-	p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
+	i_buffer_write = i_buffer_read = 0;
+	
+	for (int i = 0; i < 1024; i++) {
+		linebuf[i] = 0;
+	}
+	i_linebuf = 0;
+	buffer_overflow = false;
+	
+	//p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
 }
 
 IMU::~IMU() {
@@ -37,21 +45,13 @@ void IMU::putc(char c) {
 	p_device->putc(c);
 }
 
-int IMU::buffer_find(char c) {
-	for (int i = 0; i < buffer_index; i++) {
-		if (buffer[i] == c) return i;
-	}
-	return buffer_index;
-}
-
-
 // Checks data integrity of buffer, then stores the IMU values into variables.
-void IMU::parse(char* buf) {
-	buf[buffer_index] = '\0';
+void IMU::parse() {
+	linebuf[i_linebuf] = '\0';
 	//print_serial(p_pc, buf);
 	short temp[9];
 	// we <3 pointer arithmetic
-	if (sscanf(buf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8)){
+	if (sscanf(linebuf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8) == 9){
 		accX = temp[0];
 		accY = temp[1];
 		accZ = temp[2];
@@ -61,11 +61,12 @@ void IMU::parse(char* buf) {
 		magX = temp[6];
 		magY = temp[7];
 		magZ = temp[8];
+		
 		led3 = !led3;
 	}
 
-	char printtemp[75];
-	sprintf(printtemp, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
+	//char printtemp[75];
+	//sprintf(printtemp, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
 	//print_serial(p_pc, printtemp);
 }
 
@@ -85,43 +86,31 @@ char IMU::getc() {
  */
 void IMU::attach(void (*fptr)(void)) {
 	//p_pc->putc('a');
-	p_device->attach(fptr);
+	// Attach it as an RX interrupt only.
+	p_device->attach(fptr, Serial::RxIrq);
 }
 
 void IMU::getData() {
 	//print_serial(p_pc, "hello");
 	//p_pc->printf("hi");
 	
-	if (IMUreadable) {
-	   // p_pc->printf("imu readable\n\r");
-	   
-		if (debugMode) {
-			while (readable()) {
-				
-				char c = getc();
-				//p_pc->putc(c);
-				//if (c == '#') p_pc->printf("where the hell is my pound?\r\n");
-				
-			}
+	// While there is data to be read, or the buffer has overflowed.
+	while (i_buffer_read != i_buffer_write || buffer_overflow) {
+		linebuf[i_linebuf] = buffer[i_buffer_read];
+		i_buffer_read = (i_buffer_read + 1) % IMU_RX_BUFFER_SIZE;
+		buffer_overflow = false;
+		i_linebuf++;
+		if (linebuf[i_linebuf - 1] == '#') {
+			parseNow = true;
+			break;
 		}
-		else {
-			while (readable()) {
-
-				char c = getc();
-				buffer[buffer_index] = c;
-				buffer_index++;
-				if (buffer[buffer_index - 1] == '#') {
-					parseNow = true;
-					break;
-				}
-			}
-		}
-
-		IMUreadable = false;
+		led4 = !led4;
 	}
 	
+	NVIC_EnableIRQ(UART3_IRQn);
+	
 	if (parseNow) {
-		parse(buffer);
+		parse();
 		
 		/*
 		 * IMU Calibration Code
@@ -152,19 +141,14 @@ void IMU::getData() {
 			
 		}
 		
-		// Clear the buffer.
-		for (int i = 0; i < buffer_index; i++) {
-			buffer[i] = 0;
+		// Clear the line buffer.
+		for (int i = 0; i < 1024; i++) {
+			linebuf[i] = 0;
 		}
-		buffer_index = 0;
+		i_linebuf = 0;
 		
 		//p_pc->printf("cleared\n\r");
 		parseNow = false;
-		
-	}
-		
-	if (!NVIC_GetActive(UART3_IRQn)) {
-		NVIC_EnableIRQ(UART3_IRQn);
 	}
 }
 

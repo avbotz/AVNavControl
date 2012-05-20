@@ -12,7 +12,7 @@
 #include "debug.h"
 
 extern void send_to_pc();
-void readIMU(), readPC(), sendPC();
+void readIMU(), readPC(), sendPC(), sendMotor();
 
 extern Serial pc;
 
