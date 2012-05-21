@@ -17,7 +17,8 @@ float AnalogInput::getValueRaw() {
 	return p_analog->read();
 }
 
-AnalogPressureSensor::AnalogPressureSensor(PinName pin, float calibration_m, float calibration_b) : 
+AnalogPressureSensor::
+AnalogPressureSensor(PinName pin, float calibration_m, float calibration_b) : 
 AnalogInput(pin) {
 	m = calibration_m;
 	b = calibration_b;
@@ -36,7 +37,6 @@ AnalogPressureSensor::~AnalogPressureSensor() {
  * We add 0.5 to y so that it rounds correctly when we truncate into an integer.
  */
 int AnalogPressureSensor::getValueCalibrated() {
-
 	return (int)(getValueRaw() * m + b + 0.5f);
 }
 
@@ -57,9 +57,9 @@ AnalogKillSwitch::~AnalogKillSwitch() {
 }
 
 /* 
- * getValueRaw is a slight misnomer, considering that we average the raw value
- * with previous values. In fact, it's unlikely that we need this code; there
- * shouldn't be that much noise.
+ * getValueRaw may not do what you think it does. The value is "raw" because it
+ * is not thresholded. It is not "raw" because it is the raw data from the
+ * sensor.
  */
 float AnalogKillSwitch::getValueRaw() {
 	// TODO: test this averaging code. Is it enough?
