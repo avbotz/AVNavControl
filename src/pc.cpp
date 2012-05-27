@@ -1,6 +1,43 @@
 #include "pc.h"
 
 
+PC::PC(PinName tx, PinName, rx, int baud)
+{
+	p_device = new Serial(tx, rx);
+	p_device->baud(baud);
+
+	// Set an interrupt to send data to the BeagleBoard every 1.0 seconds.
+
+	for (int i = 0; i < PC_BUFFER_SIZE; i++) {
+		rx_buffer[i] = tx_buffer[i] = 0;
+	}
+
+	i_tx_read = i_tx_write = 0
+	i_rx_read, i_rx_write = 0
+
+	tx_empty = true;
+
+
+	/*
+ * This is the buffer for the message that will be sent to the BeagleBoard.
+ * Format: 'h', AVNav-encoded data for heading,
+ *         'd', AVNav-encoded data for depth (pressure sensor),
+ *         'p', AVNav-encoded data for power (motors),
+ *         kill switch status (l is dead and k is alive),
+ *         '\n' to terminate the message.
+ */
+	mes = new char[12];
+	strcpy(mes, "h||d||p|||\n");
+
+	p_device->attach(&rx_interrupt, Serial::RxIrq);
+	p_device->attach(&tx_interrupt, Serial::TxIrq);
+
+	if (!debug) {
+		pc_ticker = new Ticker();
+		ticker_pc->attach(&send_status, 1.0);
+	}
+}
+
 // The avnav functions encode data into AVNav format: 
 // 
 // - 0x00 to 0x1f reserved for low-level commands, like legacy, pre-mbed bootloader
@@ -12,7 +49,7 @@
 // byte is a command or data. Downside is that the data is less human-readable,
 // but it's not like the BeagleBoard is a person or sentient being.
 
-avnav encode_avnav(int data) {
+avnav PC::encode_avnav(int data) {
 	avnav encoded;
 	
 	data &= 0x3fff;
@@ -22,15 +59,15 @@ avnav encode_avnav(int data) {
 	return encoded;
 }
 
-int decode_avnav(avnav data) {
+int PC::decode_avnav(avnav data) {
 	return ((data.byte1 - 0x20) << 6) | (data.byte2 - 0x20);
 }
 
-// TODO: this function is UNTESTED
-void send_to_pc() {
-	// Holds data while it's being moved around.
+
+void PC::send_status()
+{
 	avnav avnav_temp;
-	
+
 	// Construct the message to the BeagleBoard based on state of the sub.
 	// get heading value
 	avnav_temp = encode_avnav(calcH);
@@ -52,9 +89,106 @@ void send_to_pc() {
 	mes[9] = kill.getValueThresh() ? 'k' : 'l';
 	
 	// print message to PC
-	if (pc.writeable()) {
-		for (int i = 0; i < MESSAGE_LENGTH - 1; i++) {
-			pc.putc(mes[i]);
+	send_message(mes);
+}
+
+void PC::send_message(const char* message)
+{
+	int i = 0;
+	while (message[i]) {
+		putc(message[i]);
+		i++;
+	}
+}
+
+void PC::putc(char c)
+{
+	tx_buffer[i_tx_write] = c;
+	NVIC_DisableIRQ(UART1_IRQn);
+	i_tx_write = (i_tx_write + 1) % PC_BUFFER_SIZE;
+	NVIC_EnableIRQ(UART1_IRQn);
+	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
+}
+
+void PC::tx_interrupt()
+{
+	while (p_device->writeable() && i_tx_write != i_tx_read) {
+		p_device->putc(buffer[i_tx_read]);
+		i_tx_read = (i_tx_read + 1) % PC_BUFFER_SIZE;
+		tx_empty = false;
+	}
+	if (i_tx_write == i_tx_read) {
+		tx_empty = true;
+		NVIC_DisableIRQ(UART1_IRQn);
+		// if nothing to write, turn off the interrupt until motor.getc() is called again
+	}
+}
+
+void PC::rx_interrupt()
+{
+	while (p_device->readable()) {
+		rx_buffer[i_rx_write] = p_device->getc();
+		NVIC_DisableIRQ(UART0_IRQn);
+		i_buffer_write = (i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
+		NVIC_EnableIRQ(UART0_IRQn);
+		if (i_rx_write == i_rx_read) {
+			rx_overflow = true;
+			NVIC_DisableIRQ(UART0_IRQn);
+			break;
 		}
 	}
+}
+
+
+//in debug mode it returns the next character
+//otherwise it reads characters and updates the desired stuff
+char PC::readPC()
+{
+	if (debug) {
+		if (i_rx_read == i_rx_write) return 0;
+		char ret = rx_buffer[i_rx_read];
+		i_rx_read = (i_rx_read + 1) % PC_BUFFER_SIZE;
+		return ret;
+	}
+	
+	while ((i_rx_read != i_rx_write &&
+			((i_rx_read + 1) % PC_BUFFER_SIZE) != i_rx_write &&		//make sure there are 4 characters to be read
+			((i_rx_read + 2) % PC_BUFFER_SIZE) != i_rx_write &&
+			((i_rx_read + 3) % PC_BUFFER_SIZE) != i_rx_write &&
+			(rx_buffer[(i_rx_read + 3) % PC_BUFFER_SIZE] == '\n') || //and the fourth character is a newline
+			rx_overflow) { 
+		rx_overflow = false;
+		avnav temp;
+		switch (rx_buffer[i_rx_read]) {
+			//read 2 bytes, process them, and set the right variables
+			//the last increment skips the newline
+		case 'h':
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte1 = rx_buffer[i_rx_read];
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte2 = rx_buffer[i_rx_read];
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			desired_heading = decode_avnav(temp);
+			break;
+		case 'd':
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte1 = rx_buffer[i_rx_read];
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte2 = rx_buffer[i_rx_read];
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			desired_depth = decode_avnav(temp);
+			break;
+		case 'p':
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte1 = rx_buffer[i_rx_read];
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte2 = rx_buffer[i_rx_read];
+			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			desired_power = decode_avnav(temp);
+			break;
+		}
+
+		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+	}
+	return 1;
 }

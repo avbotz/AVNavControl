@@ -6,28 +6,50 @@
 #include "analog.h"
 #include "pid.h"
 
+#define PC_BUFFER_SIZE 1024
+
 struct avnav {
 	char byte1;
 	char byte2;
 };
 
-avnav encode_avnav(int data);
-int decode_avnav(avnav data);
-void send_to_pc();
-
-/*
- * This is the buffer for the message that will be sent to the BeagleBoard.
- * Format: 'h', AVNav-encoded data for heading,
- *         'd', AVNav-encoded data for depth (pressure sensor),
- *         'p', AVNav-encoded data for power (motors),
- *         kill switch status (l is dead and k is alive),
- *         '\n' to terminate the message.
- */
-char mes[] = "h||d||p|||\n";
-
-#define MESSAGE_LENGTH (sizeof(mes)/sizeof(char))
 
 
-extern Serial pc;
+class PC {
+public:
+	PC(PinName tx, PinName rx, int baud);
+
+	avnav encode_avnav(int data);
+	int decode_avnav(avnav data);
+	void send_status();
+	void send_message(const char* message);
+
+	void putc(char c); //add c to the write FIFO
+
+	char readPC();
+
+	int desired_heading, desired_depth, desired_power;
+
+	Serial* p_device;
+	Ticker* pc_ticker;
+
+	bool tx_empty;
+	bool rx_overflow;
+
+	void tx_interrupt();
+private:
+
+	char* mes;
+	int message_length;
+	char tx_buffer[PC_BUFFER_SIZE], rx_buffer[PC_BUFFER_SIZE];
+	int i_tx_read, i_tx_write;
+	int i_rx_read, i_rx_write;
+	
+	void rx_interrupt();
+
+}
+
+extern bool debug;
+extern PC pc;
 
 #endif

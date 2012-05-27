@@ -24,7 +24,7 @@ AnalogPressureSensor pressure(p17, 100.0f, 0.0f);
 
 
 //avnavcontrol.h
-Serial pc(USBTX, USBRX); //tx, rx
+PC pc(USBTX, USBRX, 115200); //tx, rx
 
 //IMU.h
 IMU imu(p9, p10, 57600, &pc);
@@ -36,3 +36,5 @@ DigitalOut led1(LED1),	// Kill status
            led2(LED2),	// debug
            led3(LED3),	// debug
            led4(LED4);	// debug
+
+bool debug = false;

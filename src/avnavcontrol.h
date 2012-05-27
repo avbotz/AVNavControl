@@ -16,11 +16,10 @@ void readIMU(), readPC(), sendPC(), sendMotor();
 
 extern Serial pc;
 
-Ticker ticker_pc;
-
 bool isAlive = false;
 bool PCreadable, PCsendable;
 
+extern bool debug;
 
 
 // Do not remove

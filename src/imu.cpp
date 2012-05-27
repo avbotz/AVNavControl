@@ -18,8 +18,7 @@ IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	accX = accY = accZ = gyrX = gyrY = gyrZ = magX = magY = magZ = 0;
 	parseNow = false;
 	
-	debugMode = false;
-	
+	//intialize the buffers and buffer indicies
 	for (int i = 0; i < IMU_RX_BUFFER_SIZE; i++) {
 		buffer[i] = 0;
 	}
@@ -31,7 +30,9 @@ IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	i_linebuf = 0;
 	buffer_overflow = false;
 	
-	//p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
+	// Attach it as an RX interrupt only.
+	p_device->attach(&rx_interrupt, Serial::RxIrq);
+	p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
 }
 
 IMU::~IMU() {
@@ -77,17 +78,6 @@ bool IMU::readable() {
 
 char IMU::getc() {
 	return p_device->getc();
-}
-
-/* 
- * Wrapper function to attach a callback function to the RX interrupt of the 
- * IMU Serial object. The function is called whenever the IMU sends a 
- * character.
- */
-void IMU::attach(void (*fptr)(void)) {
-	//p_pc->putc('a');
-	// Attach it as an RX interrupt only.
-	p_device->attach(fptr, Serial::RxIrq);
 }
 
 void IMU::getData() {
@@ -209,4 +199,22 @@ void IMU::calcHeading() {
 	*/
 	
 		
+}
+
+void IMU::rx_interrupt()
+{
+	led2 = !led2;
+	
+	while (p_device->readable()) {
+		buffer[i_buffer_write] = p_device->getc();
+		//pc.putc(imu.buffer[imu.i_buffer_write]);
+		NVIC_DisableIRQ(UART3_IRQn);
+		i_buffer_write = (i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
+		NVIC_EnableIRQ(UART3_IRQn);
+		if (i_buffer_write == i_buffer_read) {
+			buffer_overflow = true;
+			NVIC_DisableIRQ(UART3_IRQn);
+			break;
+		}
+	}
 }
