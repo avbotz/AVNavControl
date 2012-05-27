@@ -13,7 +13,7 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	p_device->format(8, Serial::None, 1);
 	p_device->baud(baud); // Set the baud.
 	
-	p_device->attach(&tx_interrupt, Serial::TxIrq);
+	p_device->attach(&tx_interrupt_motor, Serial::TxIrq);
 
 	for (int i = 0; i < MOTOR_TX_BUF_SIZE; i++) {
 		buffer[i] = 0;
@@ -69,15 +69,15 @@ char Motor::get(int i_motor) {
 	return motors[i_motor];
 }
 
-void Motor::tx_interrupt(){
-	while (p_device->writeable() && i_buffer_write != i_buffer_read) {
-		p_device->putc(buffer[i_buffer_read]);
-		i_buffer_read = (i_buffer_read + 1) % MOTOR_TX_BUF_SIZE;
-		buffer_empty = false;
+void tx_interrupt_motor() {
+	while (motor.p_device->writeable() && motor.i_buffer_write != motor.i_buffer_read) {
+		motor.p_device->putc(motor.buffer[motor.i_buffer_read]);
+		motor.i_buffer_read = (motor.i_buffer_read + 1) % MOTOR_TX_BUF_SIZE;
+		motor.buffer_empty = false;
 	}
-	if (i_buffer_write == i_buffer_read) {
-		buffer_empty = true;
-		NVIC_DisableIRQ(UART0_IRQn);
+	if (motor.i_buffer_write == motor.i_buffer_read) {
+		motor.buffer_empty = true;
+		NVIC_DisableIRQ(UART1_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
 }

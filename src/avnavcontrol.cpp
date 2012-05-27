@@ -22,7 +22,7 @@ int main() {
 	// every 1s: send data to pc
 	// upon serial from pc: set desired heading and desired depth
 	//print_serial(&pc, "hi");
-	int i = 0;
+	
 	while (true) {
 		//led1 = isAlive = kill.getValueThresh();
 		//led2 = !led2;
@@ -47,10 +47,10 @@ int main() {
 				}
 			}
 			if (motor.buffer_empty) {
-				motor.tx_interrupt();
+				tx_interrupt_motor();
 			}
 			if (pc.tx_empty) {
-				pc.tx_interrupt();
+				tx_interrupt_pc();
 			}
 	
 			if (debug) {
@@ -134,7 +134,7 @@ int main() {
 							manual = false;
 							break;
 						default:
-							pc.printf("Unrecognized command.\n\r");
+							pc.send_message("Unrecognized command.\n\r");
 						break;
 					}
 				}

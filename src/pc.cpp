@@ -1,7 +1,7 @@
 #include "pc.h"
 
 
-PC::PC(PinName tx, PinName, rx, int baud)
+PC::PC(PinName tx, PinName rx, int baud)
 {
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
@@ -12,8 +12,8 @@ PC::PC(PinName tx, PinName, rx, int baud)
 		rx_buffer[i] = tx_buffer[i] = 0;
 	}
 
-	i_tx_read = i_tx_write = 0
-	i_rx_read, i_rx_write = 0
+	i_tx_read = i_tx_write = 0;
+	i_rx_read = i_rx_write = 0;
 
 	tx_empty = true;
 
@@ -29,12 +29,12 @@ PC::PC(PinName tx, PinName, rx, int baud)
 	mes = new char[12];
 	strcpy(mes, "h||d||p|||\n");
 
-	p_device->attach(&rx_interrupt, Serial::RxIrq);
-	p_device->attach(&tx_interrupt, Serial::TxIrq);
+	p_device->attach(&rx_interrupt_pc, Serial::RxIrq);
+	p_device->attach(&tx_interrupt_pc, Serial::TxIrq);
 
 	if (!debug) {
 		pc_ticker = new Ticker();
-		ticker_pc->attach(&send_status, 1.0);
+		pc_ticker->attach(&send_status_pc, 1.0);
 	}
 }
 
@@ -64,32 +64,32 @@ int PC::decode_avnav(avnav data) {
 }
 
 
-void PC::send_status()
+void send_status_pc()
 {
 	avnav avnav_temp;
 
 	// Construct the message to the BeagleBoard based on state of the sub.
 	// get heading value
-	avnav_temp = encode_avnav(calcH);
-	mes[1] = avnav_temp.byte1;
-	mes[2] = avnav_temp.byte2;
+	avnav_temp = pc.encode_avnav(calcH);
+	pc.mes[1] = avnav_temp.byte1;
+	pc.mes[2] = avnav_temp.byte2;
 	
 	// get depth (pressure sensor) value
-	avnav_temp = encode_avnav(pressure.getValueCalibrated());
-	mes[4] = avnav_temp.byte1;
-	mes[5] = avnav_temp.byte2;
+	avnav_temp = pc.encode_avnav(pressure.getValueCalibrated());
+	pc.mes[4] = avnav_temp.byte1;
+	pc.mes[5] = avnav_temp.byte2;
 	
 	// get power (motor) value
-	avnav_temp = encode_avnav(desPower);
-	mes[7] = avnav_temp.byte1;
-	mes[8] = avnav_temp.byte2;
+	avnav_temp = pc.encode_avnav(desPower);
+	pc.mes[7] = avnav_temp.byte1;
+	pc.mes[8] = avnav_temp.byte2;
 	
 	// get kill switch value
 	// TODO: is this correct? I assume voltage on kill pin means alive.
-	mes[9] = kill.getValueThresh() ? 'k' : 'l';
+	pc.mes[9] = kill.getValueThresh() ? 'k' : 'l';
 	
 	// print message to PC
-	send_message(mes);
+	pc.send_message(pc.mes);
 }
 
 void PC::send_message(const char* message)
@@ -110,29 +110,29 @@ void PC::putc(char c)
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
 }
 
-void PC::tx_interrupt()
+void tx_interrupt_pc()
 {
-	while (p_device->writeable() && i_tx_write != i_tx_read) {
-		p_device->putc(buffer[i_tx_read]);
-		i_tx_read = (i_tx_read + 1) % PC_BUFFER_SIZE;
-		tx_empty = false;
+	while (pc.p_device->writeable() && pc.i_tx_write != pc.i_tx_read) {
+		pc.p_device->putc(pc.tx_buffer[pc.i_tx_read]);
+		pc.i_tx_read = (pc.i_tx_read + 1) % PC_BUFFER_SIZE;
+		pc.tx_empty = false;
 	}
-	if (i_tx_write == i_tx_read) {
-		tx_empty = true;
+	if (pc.i_tx_write == pc.i_tx_read) {
+		pc.tx_empty = true;
 		NVIC_DisableIRQ(UART1_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
 }
 
-void PC::rx_interrupt()
+void rx_interrupt_pc()
 {
-	while (p_device->readable()) {
-		rx_buffer[i_rx_write] = p_device->getc();
+	while (pc.p_device->readable()) {
+		pc.rx_buffer[pc.i_rx_write] = pc.p_device->getc();
 		NVIC_DisableIRQ(UART0_IRQn);
-		i_buffer_write = (i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
+		pc.i_rx_write = (pc.i_rx_write + 1) % PC_BUFFER_SIZE;
 		NVIC_EnableIRQ(UART0_IRQn);
-		if (i_rx_write == i_rx_read) {
-			rx_overflow = true;
+		if (pc.i_rx_write == pc.i_rx_read) {
+			pc.rx_overflow = true;
 			NVIC_DisableIRQ(UART0_IRQn);
 			break;
 		}
@@ -155,7 +155,7 @@ char PC::readPC()
 			((i_rx_read + 1) % PC_BUFFER_SIZE) != i_rx_write &&		//make sure there are 4 characters to be read
 			((i_rx_read + 2) % PC_BUFFER_SIZE) != i_rx_write &&
 			((i_rx_read + 3) % PC_BUFFER_SIZE) != i_rx_write &&
-			(rx_buffer[(i_rx_read + 3) % PC_BUFFER_SIZE] == '\n') || //and the fourth character is a newline
+			(rx_buffer[(i_rx_read + 3) % PC_BUFFER_SIZE] == '\n')) || //and the fourth character is a newline
 			rx_overflow) { 
 		rx_overflow = false;
 		avnav temp;

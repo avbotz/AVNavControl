@@ -5,15 +5,21 @@
 #include <string>
 #include <sstream>
 #include <limits.h>
+
 #include "debug.h"
+#include "pc.h"
 
 #define IMU_RX_BUFFER_SIZE 1024
+
+void rx_interrupt_imu();
 
 class IMU {
 // TODO: Figure out which functions and variables can be private.
 public:
-	IMU(PinName tx, PinName rx, int baud, Serial* pc);
+	IMU(PinName tx, PinName rx, int baud, PC* pc);
 	~IMU();
+	
+	friend void rx_interrupt_imu();
 	
 	void putc(char);
 	bool readable();
@@ -52,9 +58,9 @@ private:
 	char linebuf[1024];
 	int i_linebuf;
 	bool buffer_overflow;
-
-	void rx_interupt();
 };
+
+void rx_interrupt();
 
 extern IMU imu;
 

@@ -19,6 +19,8 @@
 #define BACK 3
 #endif
 
+void tx_interrupt_motor();
+
 // Stores values for and communicates with the motor controller.
 // We use the Mini SSC II format. This is used to control the motors and move the sub.
 class Motor {
@@ -36,7 +38,7 @@ public:
 	
 	bool buffer_empty;
 
-	void tx_interrupt();
+	friend void tx_interrupt_motor();
 	
 private:
 	int num_motors; // number of motors, counting from 1

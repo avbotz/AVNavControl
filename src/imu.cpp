@@ -1,8 +1,8 @@
 #include "mbed.h"
 #include "imu.h"
 
-IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
-	p_pc = pc;
+IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
+	p_pc = pc->p_device;
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
 	p_device->format(8, Serial::None, 1);   // serial settings for the IMU--refer to IMU's data sheet
@@ -31,7 +31,7 @@ IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	buffer_overflow = false;
 	
 	// Attach it as an RX interrupt only.
-	p_device->attach(&rx_interrupt, Serial::RxIrq);
+	p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
 	p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
 }
 
@@ -74,10 +74,6 @@ void IMU::parse() {
 
 bool IMU::readable() {
 	return p_device->readable();
-}
-
-char IMU::getc() {
-	return p_device->getc();
 }
 
 void IMU::getData() {
@@ -201,18 +197,18 @@ void IMU::calcHeading() {
 		
 }
 
-void IMU::rx_interrupt()
+void rx_interrupt_imu()
 {
 	led2 = !led2;
 	
-	while (p_device->readable()) {
-		buffer[i_buffer_write] = p_device->getc();
+	while (imu.p_device->readable()) {
+		imu.buffer[imu.i_buffer_write] = imu.p_device->getc();
 		//pc.putc(imu.buffer[imu.i_buffer_write]);
 		NVIC_DisableIRQ(UART3_IRQn);
-		i_buffer_write = (i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
+		imu.i_buffer_write = (imu.i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
 		NVIC_EnableIRQ(UART3_IRQn);
-		if (i_buffer_write == i_buffer_read) {
-			buffer_overflow = true;
+		if (imu.i_buffer_write == imu.i_buffer_read) {
+			imu.buffer_overflow = true;
 			NVIC_DisableIRQ(UART3_IRQn);
 			break;
 		}

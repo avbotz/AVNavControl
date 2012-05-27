@@ -13,7 +13,9 @@ struct avnav {
 	char byte2;
 };
 
-
+void rx_interrupt_pc();
+void tx_interrupt_pc();
+void send_status_pc();
 
 class PC {
 public:
@@ -21,7 +23,6 @@ public:
 
 	avnav encode_avnav(int data);
 	int decode_avnav(avnav data);
-	void send_status();
 	void send_message(const char* message);
 
 	void putc(char c); //add c to the write FIFO
@@ -36,18 +37,18 @@ public:
 	bool tx_empty;
 	bool rx_overflow;
 
-	void tx_interrupt();
 private:
-
+	friend void rx_interrupt_pc();
+	friend void tx_interrupt_pc();
+	friend void send_status_pc();
+	
 	char* mes;
 	int message_length;
 	char tx_buffer[PC_BUFFER_SIZE], rx_buffer[PC_BUFFER_SIZE];
 	int i_tx_read, i_tx_write;
 	int i_rx_read, i_rx_write;
-	
-	void rx_interrupt();
 
-}
+};
 
 extern bool debug;
 extern PC pc;

@@ -10,11 +10,12 @@
 #include "motor.h"
 #include "pid.h"
 #include "debug.h"
+#include "pc.h"
 
 extern void send_to_pc();
 void readIMU(), readPC(), sendPC(), sendMotor();
 
-extern Serial pc;
+extern PC pc;
 
 bool isAlive = false;
 bool PCreadable, PCsendable;
