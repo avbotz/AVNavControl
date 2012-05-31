@@ -13,6 +13,8 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	p_device->format(8, Serial::None, 1);
 	p_device->baud(baud); // Set the baud.
 	
+	p_device->attach(&tx_interrupt_motor, Serial::TxIrq);
+
 	for (int i = 0; i < MOTOR_TX_BUF_SIZE; i++) {
 		buffer[i] = 0;
 	}
@@ -27,11 +29,6 @@ Motor::~Motor() {
 		// must do this. otherwise, you'll have memory leakage & you may not be able to re-open the serial port later
 		delete p_device;
 	}
-}
-
-void Motor::attach(void (*fptr)(void)) {
-	// Attach as a transmit interrupt only.
-	p_device->attach(fptr, Serial::TxIrq);
 }
 
 void Motor::putc(char c) {
@@ -70,6 +67,19 @@ void Motor::set(int i_motor, unsigned char value) {
 
 char Motor::get(int i_motor) {
 	return motors[i_motor];
+}
+
+void tx_interrupt_motor() {
+	while (motor.p_device->writeable() && motor.i_buffer_write != motor.i_buffer_read) {
+		motor.p_device->putc(motor.buffer[motor.i_buffer_read]);
+		motor.i_buffer_read = (motor.i_buffer_read + 1) % MOTOR_TX_BUF_SIZE;
+		motor.buffer_empty = false;
+	}
+	if (motor.i_buffer_write == motor.i_buffer_read) {
+		motor.buffer_empty = true;
+		NVIC_DisableIRQ(UART1_IRQn);
+		// if nothing to write, turn off the interrupt until motor.getc() is called again
+	}
 }
 
 
