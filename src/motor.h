@@ -19,13 +19,14 @@
 #define BACK 3
 #endif
 
+void tx_interrupt_motor();
+
 // Stores values for and communicates with the motor controller.
 // We use the Mini SSC II format. This is used to control the motors and move the sub.
 class Motor {
 public:
 	Motor(int num_motors, int baud, PinName tx, PinName rx);
 	~Motor();
-	void attach(void (*fptr)(void));
 	void putc(char c); // add c to the FIFO buffer.
 	void send(); // send all motors' speeds to the controller
 	void send(int i_motor); // send speed of motor i_motor to the controller
@@ -35,10 +36,9 @@ public:
 	
 	Serial* p_device; // pointer to our serial object (used to send stuff)
 	
-	char buffer[MOTOR_TX_BUF_SIZE];
-	int i_buffer_read, i_buffer_write;
-	
 	bool buffer_empty;
+
+	friend void tx_interrupt_motor();
 	
 private:
 	int num_motors; // number of motors, counting from 1
@@ -54,6 +54,11 @@ private:
 	 */
 
 	char motors[12]; //The controller supports twelve motors. This array locally stores their speeds.
+
+	
+
+	char buffer[MOTOR_TX_BUF_SIZE];
+	int i_buffer_read, i_buffer_write;
 };
 
 extern Motor motor;

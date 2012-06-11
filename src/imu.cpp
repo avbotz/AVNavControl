@@ -1,8 +1,8 @@
 #include "mbed.h"
 #include "imu.h"
 
-IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
-	p_pc = pc;
+IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
+	p_pc = pc->p_device;
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
 	p_device->format(8, Serial::None, 1);   // serial settings for the IMU--refer to IMU's data sheet
@@ -18,8 +18,7 @@ IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	accX = accY = accZ = gyrX = gyrY = gyrZ = magX = magY = magZ = 0;
 	parseNow = false;
 	
-	debugMode = false;
-	
+	//intialize the buffers and buffer indicies
 	for (int i = 0; i < IMU_RX_BUFFER_SIZE; i++) {
 		buffer[i] = 0;
 	}
@@ -31,7 +30,9 @@ IMU::IMU(PinName tx, PinName rx, int baud, Serial* pc) {
 	i_linebuf = 0;
 	buffer_overflow = false;
 	
-	//p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
+	// Attach it as an RX interrupt only.
+	p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
+	p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
 }
 
 IMU::~IMU() {
@@ -73,21 +74,6 @@ void IMU::parse() {
 
 bool IMU::readable() {
 	return p_device->readable();
-}
-
-char IMU::getc() {
-	return p_device->getc();
-}
-
-/* 
- * Wrapper function to attach a callback function to the RX interrupt of the 
- * IMU Serial object. The function is called whenever the IMU sends a 
- * character.
- */
-void IMU::attach(void (*fptr)(void)) {
-	//p_pc->putc('a');
-	// Attach it as an RX interrupt only.
-	p_device->attach(fptr, Serial::RxIrq);
 }
 
 void IMU::getData() {
@@ -209,4 +195,22 @@ void IMU::calcHeading() {
 	*/
 	
 		
+}
+
+void rx_interrupt_imu()
+{
+	led2 = !led2;
+	
+	while (imu.p_device->readable()) {
+		imu.buffer[imu.i_buffer_write] = imu.p_device->getc();
+		//pc.putc(imu.buffer[imu.i_buffer_write]);
+		NVIC_DisableIRQ(UART3_IRQn);
+		imu.i_buffer_write = (imu.i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
+		NVIC_EnableIRQ(UART3_IRQn);
+		if (imu.i_buffer_write == imu.i_buffer_read) {
+			imu.buffer_overflow = true;
+			NVIC_DisableIRQ(UART3_IRQn);
+			break;
+		}
+	}
 }

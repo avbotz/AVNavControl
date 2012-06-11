@@ -74,8 +74,6 @@ extern float depth;
 
 extern unsigned char motorArray[4];
 
-extern Serial pc;
-
 void reset_pid();
 void init_pid();
 void do_pid();
