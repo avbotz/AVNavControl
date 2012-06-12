@@ -12,6 +12,8 @@ int main() {
 
 	//
 	init_pid();
+	Ticker pid_ticker;
+	pid_ticker.attach(&do_pid, DT);
 
 	// poll devices
 	// imu
@@ -41,7 +43,6 @@ int main() {
 
 			if (!manual) {
 				give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
-				do_pid();
 				for (int i = 0; i < 4; i++) {
 					motor.set(i, motorArray[i]);
 				}

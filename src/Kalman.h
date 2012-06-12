@@ -4,8 +4,8 @@
 #include "mbed.h"
 
 #define GYR_SCALE	1/14.375f  //degrees per LSB
-#define SAMPLES_PER_SECOND 100
-#define DT 1.0f/SAMPLES_PER_SECOND //measured in Hz
+#define SAMPLES_PER_SECOND 10  //measured in Hz
+#define DT 1.0f/SAMPLES_PER_SECOND
 
 
  // Average values with IMU on flat surface.
@@ -15,7 +15,7 @@
 
 #define MU_X_GYR -47.490779
 #define MU_Y_GYR 16.386080
-#define MU_Z_GYR -1.093793
+#define MU_Z_GYR 79.5
 
 #define MU_X_COM -41.903232
 #define MU_Y_COM 8.644656
