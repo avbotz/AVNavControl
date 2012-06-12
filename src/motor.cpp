@@ -21,6 +21,9 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	i_buffer_write = i_buffer_read = 0;
 	motor.buffer_empty = true;
 	set(127);   // The motors should start stationary (zero power)
+
+	Ticker motor_ticker;
+	motor_ticker.attach(&send, DT/2)
 }
 
 // MiniSSC2's Destructor
@@ -62,7 +65,6 @@ void Motor::set(unsigned char value) {
 
 void Motor::set(int i_motor, unsigned char value) {
 	motors[i_motor] = value;
-	send(i_motor);
 }
 
 char Motor::get(int i_motor) {

@@ -12,8 +12,6 @@ int main() {
 
 	//
 	init_pid();
-	Ticker pid_ticker;
-	pid_ticker.attach(&do_pid, DT);
 
 	// poll devices
 	// imu

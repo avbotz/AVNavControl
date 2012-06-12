@@ -67,6 +67,9 @@ void init_pid() {
 	depthPID->setDt(DT);
 	
 	reset_pid();
+
+	Ticker pid_ticker;
+	pid_ticker.attach(&do_pid, DT);
 }
 
 void do_pid() {
