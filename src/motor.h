@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include "debug.h"
+#include "Kalman.h"
 
 #define SYNC_BYTE 255
 #define MOTOR_TX_BUF_SIZE 1024
