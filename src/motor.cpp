@@ -23,7 +23,7 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	set(127);   // The motors should start stationary (zero power)
 
 	Ticker motor_ticker;
-	motor_ticker.attach(&send, DT/2);
+	motor_ticker.attach(&send_wrapper, DT/2);
 }
 
 // MiniSSC2's Destructor
@@ -40,6 +40,10 @@ void Motor::putc(char c) {
 	i_buffer_write = (i_buffer_write + 1) % MOTOR_TX_BUF_SIZE;
 	NVIC_EnableIRQ(UART1_IRQn);
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
+}
+
+void send_wrapper() {
+	send();
 }
 
 void Motor::send() {
