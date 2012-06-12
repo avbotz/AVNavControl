@@ -23,7 +23,7 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	set(127);   // The motors should start stationary (zero power)
 
 	Ticker motor_ticker;
-	motor_ticker.attach(&send, DT/2)
+	motor_ticker.attach(&send, DT/2);
 }
 
 // MiniSSC2's Destructor
