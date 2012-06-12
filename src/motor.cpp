@@ -43,7 +43,7 @@ void Motor::putc(char c) {
 }
 
 void send_wrapper() {
-	send();
+	motor.send();
 }
 
 void Motor::send() {

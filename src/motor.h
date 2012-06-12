@@ -21,6 +21,7 @@
 #endif
 
 void tx_interrupt_motor();
+void send_wrapper();
 
 // Stores values for and communicates with the motor controller.
 // We use the Mini SSC II format. This is used to control the motors and move the sub.
