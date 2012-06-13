@@ -68,8 +68,8 @@ void init_pid() {
 	
 	reset_pid();
 
-	Ticker pid_ticker;
-	pid_ticker.attach(&do_pid, DT);
+	Ticker* pid_ticker = new Ticker();
+	pid_ticker->attach(&do_pid, DT);
 }
 
 void do_pid() {

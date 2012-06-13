@@ -19,11 +19,11 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 		buffer[i] = 0;
 	}
 	i_buffer_write = i_buffer_read = 0;
-	motor.buffer_empty = true;
+	buffer_empty = true;
 	set(127);   // The motors should start stationary (zero power)
 
-	Ticker motor_ticker;
-	motor_ticker.attach(&send_wrapper, DT/2);
+	Ticker* motor_ticker = new Ticker();
+	motor_ticker->attach(&send_wrapper, DT/2);
 }
 
 // MiniSSC2's Destructor
@@ -55,7 +55,6 @@ void Motor::send() {
 void Motor::send(int i_motor) {
 	// format: {sync byte, motor id, motor power}
 	// example: {SYNC_BYTE, 2, 24} sets motor 2 to power level 24
-	
 	putc(SYNC_BYTE);
 	putc((unsigned char)i_motor);
 	putc(motors[i_motor]);
