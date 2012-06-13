@@ -12,8 +12,6 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	p_device = new Serial(tx, rx); // (tx, rx) opens up new serial device (p_device is Serial* pointer)
 	p_device->format(8, Serial::None, 1);
 	p_device->baud(baud); // Set the baud.
-	
-	p_device->attach(&tx_interrupt_motor, Serial::TxIrq);
 
 	for (int i = 0; i < MOTOR_TX_BUF_SIZE; i++) {
 		buffer[i] = 0;
@@ -21,9 +19,6 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	i_buffer_write = i_buffer_read = 0;
 	buffer_empty = true;
 	set(127);   // The motors should start stationary (zero power)
-
-	Ticker* motor_ticker = new Ticker();
-	motor_ticker->attach(&send_wrapper, DT/2);
 }
 
 // MiniSSC2's Destructor
@@ -42,7 +37,7 @@ void Motor::putc(char c) {
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
 }
 
-void send_wrapper() {
+void motor_send_wrapper() {
 	motor.send();
 }
 

@@ -31,7 +31,7 @@ IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
 	buffer_overflow = false;
 	
 	// Attach it as an RX interrupt only.
-	p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
+	
 	p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
 }
 

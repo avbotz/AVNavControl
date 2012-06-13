@@ -10,8 +10,26 @@ unsigned char motorArray[4];
 
 int main() {
 
-	//
 	init_pid();
+
+	//attach the pc interrupts
+	pc.p_device->attach(&rx_interrupt_pc, Serial::RxIrq);
+	pc.p_device->attach(&tx_interrupt_pc, Serial::TxIrq);
+
+	//attach motor interrupt
+	motor.p_device->attach(&tx_interrupt_motor, Serial::TxIrq);
+
+	//attach imu interrupt
+	imu.p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
+
+
+	//create the tickers here
+	Ticker tick[3];
+	if (!debug) {
+		tick[0].attach(&send_status_pc, 1.0);
+	}
+	tick[1].attach(&do_pid, DT);
+	tick[2].attach(&motor_send_wrapper, DT/2);
 
 	// poll devices
 	// imu
