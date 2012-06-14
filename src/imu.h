@@ -26,7 +26,6 @@ public:
 	void parse();
 	void getData();
 	void directAccess();
-	void calcHeading();
 	
 	// ticks per degree, from <http://www.sparkfun.com/datasheets/Sensors/Gyro/PS-ITG-3200-00-01.4.pdf>
 	static const float gyroScale = 0.069565f;

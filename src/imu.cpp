@@ -158,45 +158,6 @@ void IMU::directAccess() {
 	}
 }
 
-void IMU::calcHeading() {
-	// returns arctan(y/x) in radians between -pi and pi
-	float h = atan2((float)magY, (float)magX);
-	h = h * radToDeg; // convert to degrees. Now h is between -180 and 180.
-	
-	// retarded code
-	//h += 180; // now it's between 0 and 360.
-	
-	// Convert into degrees heading (i.e., 0 deg means we're going forward)
-	h = 90 - h;
-	
-	// for 2nd quadrant --- is this necessary?
-	while (h < 0) {
-		h += 360;
-	}
-	
-	heading = (short)(h + 0.5f); // adding 0.5 so that it rounds instead of truncating.
-	//p_pc->printf("calculated compass heading: %d\n\r", heading);
-	
-	
-	/*
-	//Adit's implementation
-	
-	float h = atan2((float)magX, (float)magY);
-	h *= radToDeg;
-	
-	// if arctan gave the correct result then only worry about negative angles
-	// otherwise add 180 (i think?) to transform the angle to where it should be (on the opposite side since magY is negative)
-	if (maxY > 0) {
-		h += (h < 0) ? 360 : 0;
-	}
-	else {
-		h += 180;
-	}
-	*/
-	
-		
-}
-
 void rx_interrupt_imu()
 {
 	led2 = !led2;
