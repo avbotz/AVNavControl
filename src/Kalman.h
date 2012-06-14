@@ -4,7 +4,7 @@
 #include "mbed.h"
 
 #define GYR_SCALE	1/14.375f  //degrees per LSB
-#define SAMPLES_PER_SECOND 10  //measured in Hz
+#define SAMPLES_PER_SECOND 100  //measured in Hz
 #define DT 1.0f/SAMPLES_PER_SECOND
 
 
