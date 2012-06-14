@@ -42,8 +42,8 @@ public:
 	// Calibration variables
 	bool calibrationEnabled;
 	long long sumAccX, sumAccY, sumAccZ,
-	sumGyrX, sumGyrY, sumGyrZ,
-	sumMagX, sumMagY, sumMagZ;
+	          sumGyrX, sumGyrY, sumGyrZ,
+	          sumMagX, sumMagY, sumMagZ;
 	int minGyrX, maxGyrX, minGyrY, maxGyrY, minGyrZ, maxGyrZ;
 	int num;
 	
