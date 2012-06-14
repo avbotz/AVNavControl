@@ -28,14 +28,6 @@ PC::PC(PinName tx, PinName rx, int baud)
  */
 	mes = new char[12];
 	strcpy(mes, "h||d||p|||\n");
-
-	p_device->attach(&rx_interrupt_pc, Serial::RxIrq);
-	p_device->attach(&tx_interrupt_pc, Serial::TxIrq);
-
-	if (!debug) {
-		pc_ticker = new Ticker();
-		pc_ticker->attach(&send_status_pc, 1.0);
-	}
 }
 
 // The avnav functions encode data into AVNav format: 
