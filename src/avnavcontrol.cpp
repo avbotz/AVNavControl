@@ -150,18 +150,25 @@ int main() {
 						{ // Braces here so that variables initialized in this case aren't visible from other cases.
 							pc.send_message("Begin IMU calibration.\n");
 							// Tell the IMU to start saving calibration information.
-							imu.calibrationEnabled = true;
+							imu.setCalibrationEnabled(true);
 							// Give it some time.
 							int* imuCalibrationWait = new int;
 							*imuCalibrationWait = 5000;
-							wait_ms(*imuCalibrationWait);
+							Timer* time = new Timer();
+							time->start();
+							while (time->read_ms() < *imuCalibrationWait) {
+								if (!(time->read_ms() % 10)) {
+									imu.getData();
+								}
+							}
+							unsigned long long i = 0;
 							// String to store the information message for PC.
 							char* calibration_message = new char[200];
 							// Print a formatted message to the string.
 							sprintf(
 							 calibration_message,
-							 "IMU averages for last %d ms: %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
-							 *imuCalibrationWait,
+							 "IMU averages for last %d ms and %d readings: %lli %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
+							 *imuCalibrationWait, imu.num, imu.sumAccX,
 							 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
 							 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
 							 imu.sumMagX/(double)imu.num, imu.sumMagY/(double)imu.num, imu.sumMagZ/(double)imu.num
@@ -169,10 +176,11 @@ int main() {
 							// Safely send the string to the PC.
 							pc.send_message(calibration_message);
 							// Tell the IMU to stop sending calibration.
-							imu.calibrationEnabled = false;
+							imu.setCalibrationEnabled(false);
 							// Free the memory used by the string.
 							delete calibration_message;
 							delete imuCalibrationWait;
+							delete time;
 							break;
 						}
 						case '9':	// Act as a passthrough between IMU and PC

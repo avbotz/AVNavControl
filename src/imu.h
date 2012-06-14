@@ -26,6 +26,7 @@ public:
 	void parse();
 	void getData();
 	void directAccess();
+	void setCalibrationEnabled(bool isEnabled);
 	
 	// ticks per degree, from <http://www.sparkfun.com/datasheets/Sensors/Gyro/PS-ITG-3200-00-01.4.pdf>
 	static const float gyroScale = 0.069565f;
@@ -40,7 +41,6 @@ public:
 	bool parseNow;
 	
 	// Calibration variables
-	bool calibrationEnabled;
 	long long sumAccX, sumAccY, sumAccZ,
 	          sumGyrX, sumGyrY, sumGyrZ,
 	          sumMagX, sumMagY, sumMagZ;
@@ -51,6 +51,8 @@ public:
 	Serial* p_pc;
 	
 private:
+	bool calibrationEnabled;
+	
 	// Stores a line of raw data from the IMU
 	char buffer[IMU_RX_BUFFER_SIZE];
 	int i_buffer_read, i_buffer_write;
