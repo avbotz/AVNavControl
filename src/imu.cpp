@@ -9,11 +9,6 @@ IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
 	
 	// Calibration variables
 	calibrationEnabled = false;
-	if (calibrationEnabled) {
-		sumAccX = sumAccY = sumAccZ = sumGyrX = sumGyrY = sumGyrZ = sumMagX = sumMagY = sumMagZ = num = 0;
-		minGyrX = minGyrY = minGyrZ = INT_MAX;
-		maxGyrX = maxGyrY = maxGyrZ = -INT_MAX;
-	}
 	
 	accX = accY = accZ = gyrX = gyrY = gyrZ = magX = magY = magZ = 0;
 	parseNow = false;
@@ -117,14 +112,6 @@ void IMU::getData() {
 			sumMagZ += magZ;
 
 			num++;
-			
-			p_pc->printf(
-				"Averages: %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
-				sumAccX/(double)num, sumAccY/(double)num, sumAccZ/(double)num,
-				sumGyrX/(double)num, sumGyrY/(double)num, sumGyrZ/(double)num,
-				sumMagX/(double)num, sumMagY/(double)num, sumMagZ/(double)num
-			);
-			
 		}
 		
 		// Clear the line buffer.
@@ -155,6 +142,16 @@ void IMU::directAccess() {
 		if (p_device->readable()) {
 			p_pc->putc(p_device->getc());
 		}
+	}
+}
+
+void IMU::setCalibrationEnabled(bool isEnabled) {
+	calibrationEnabled = isEnabled;
+	// If we're turning calibration on, clear the variables.
+	if (isEnabled) {
+		sumAccX = sumAccY = sumAccZ = sumGyrX = sumGyrY = sumGyrZ = sumMagX = sumMagY = sumMagZ = num = 0;
+		minGyrX = minGyrY = minGyrZ = INT_MAX;
+		maxGyrX = maxGyrY = maxGyrZ = -INT_MAX;
 	}
 }
 
