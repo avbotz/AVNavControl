@@ -75,7 +75,7 @@ void send_status_pc()
 	pc.mes[2] = avnav_temp.byte2;
 	
 	// get depth (pressure sensor) value
-	avnav_temp = pc.encode_avnav(pressure.getValueCalibrated());
+	avnav_temp = pc.encode_avnav((int)(pressure.getValueRaw() * 1000));
 	pc.mes[4] = avnav_temp.byte1;
 	pc.mes[5] = avnav_temp.byte2;
 	
