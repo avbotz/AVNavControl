@@ -39,18 +39,18 @@ public:
 	
 	bool parseNow;
 	
+	// Calibration variables
+	bool calibrationEnabled;
+	long long sumAccX, sumAccY, sumAccZ,
+	sumGyrX, sumGyrY, sumGyrZ,
+	sumMagX, sumMagY, sumMagZ;
+	int minGyrX, maxGyrX, minGyrY, maxGyrY, minGyrZ, maxGyrZ;
+	int num;
+	
 	Serial* p_device;
 	Serial* p_pc;
 	
 private:
-	// Calibration variables
-	bool calibrationEnabled;
-	long long sumAccX, sumAccY, sumAccZ,
-			  sumGyrX, sumGyrY, sumGyrZ,
-			  sumMagX, sumMagY, sumMagZ;
-	int minGyrX, maxGyrX, minGyrY, maxGyrY, minGyrZ, maxGyrZ;
-	int num;
-
 	// Stores a line of raw data from the IMU
 	char buffer[IMU_RX_BUFFER_SIZE];
 	int i_buffer_read, i_buffer_write;

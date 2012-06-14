@@ -117,14 +117,6 @@ void IMU::getData() {
 			sumMagZ += magZ;
 
 			num++;
-			
-			p_pc->printf(
-				"Averages: %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
-				sumAccX/(double)num, sumAccY/(double)num, sumAccZ/(double)num,
-				sumGyrX/(double)num, sumGyrY/(double)num, sumGyrZ/(double)num,
-				sumMagX/(double)num, sumMagY/(double)num, sumMagZ/(double)num
-			);
-			
 		}
 		
 		// Clear the line buffer.
