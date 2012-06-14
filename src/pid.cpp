@@ -1,7 +1,7 @@
 #include "pid.h"
 
-Kalman pitchK(PITCH_BIAS);
-Kalman rollK(ROLL_BIAS);
+Kalman pitchK(MU_X_GYR);
+Kalman rollK(MU_Y_GYR);
 
 float calcP, calcH, calcR;
 float accP, accR;
