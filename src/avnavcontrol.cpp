@@ -149,11 +149,12 @@ int main() {
 						case 'c':
 						{ // Braces here so that variables initialized in this case aren't visible from other cases.
 							pc.send_message("Begin IMU calibration.\n");
+							tx_interrupt_pc();
 							// Tell the IMU to start saving calibration information.
 							imu.setCalibrationEnabled(true);
 							// Give it some time.
 							int* imuCalibrationWait = new int;
-							*imuCalibrationWait = 5000;
+							*imuCalibrationWait = 1000 * 10;
 							Timer* time = new Timer();
 							time->start();
 							while (time->read_ms() < *imuCalibrationWait) {
@@ -167,8 +168,8 @@ int main() {
 							// Print a formatted message to the string.
 							sprintf(
 							 calibration_message,
-							 "IMU averages for last %d ms and %d readings: %lli %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
-							 *imuCalibrationWait, imu.num, imu.sumAccX,
+							 "IMU averages for last %d ms and %d readings: %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
+							 *imuCalibrationWait, imu.num,
 							 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
 							 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
 							 imu.sumMagX/(double)imu.num, imu.sumMagY/(double)imu.num, imu.sumMagZ/(double)imu.num
