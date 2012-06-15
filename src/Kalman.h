@@ -75,7 +75,7 @@ private:
 	static const float R_angle = 15.0f;
 
 
-	static const float SCALE = 1/14.375f;
+	static const float SCALE = 1/(14.375f*57.3f);
 	//probably needs to be changed for new IMU. maybe pass in via constructor?
 	//I'm pretty sure this is the same thing as GYRO_SCALE in main.cpp, although the numbers
 	//are surprisingly different
