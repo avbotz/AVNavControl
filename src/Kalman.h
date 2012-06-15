@@ -9,17 +9,17 @@
 
 
  // Average values with IMU on flat surface.
-#define MU_X_ACC -5.908784
-#define MU_Y_ACC -8.193536
-#define MU_Z_ACC 256.361888
+#define MU_X_ACC 25.054545
+#define MU_Y_ACC 16.513287
+#define MU_Z_ACC 209.272727
 
-#define MU_X_GYR -47.490779
-#define MU_Y_GYR 16.386080
-#define MU_Z_GYR 79.5
+#define MU_X_GYR -39.436364
+#define MU_Y_GYR -23.176224
+#define MU_Z_GYR 70.520280
 
-#define MU_X_COM -41.903232
-#define MU_Y_COM 8.644656
-#define MU_Z_COM -159.537379
+#define MU_X_COM -282.720280
+#define MU_Y_COM -113.902098
+#define MU_Z_COM -33.027972
 
 
 //the following values are old and might have to be updated. used in Daniel's Kalman
@@ -72,10 +72,10 @@ private:
 	 * from the accelerometer. Both R and Q need to be updated for the new IMU.
 	 * See http://en.wikipedia.org/wiki/Kalman_filter#Estimation_of_the_noise_covariances_Qk_and_Rk
 	 */
-	static const float R_angle = 15.0f;
+	static const float R_angle = 120.0f;
 
 
-	static const float SCALE = 1/(14.375f*57.3f);
+	static const float SCALE = 1/14.375f;
 	//probably needs to be changed for new IMU. maybe pass in via constructor?
 	//I'm pretty sure this is the same thing as GYRO_SCALE in main.cpp, although the numbers
 	//are surprisingly different
