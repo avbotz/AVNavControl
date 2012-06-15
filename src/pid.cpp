@@ -85,8 +85,8 @@ void do_pid() {
 	// |--old--|--__--|new
 
 	fAccX = (fAccX + 2 * accX) / 3;
-	fAccX = (fAccX + 2 * accX) / 3;
-	fAccX = (fAccX + 2 * accX) / 3;
+	fAccY = (fAccY + 2 * accY) / 3;
+	fAccZ = (fAccZ + 2 * accZ) / 3;
 	fGyrZ = (fGyrZ + 2 * gyrZ) / 3;
 
 	//based on the orientation of the sensors, tan(pitch) = y/z and tan(roll) = x/z
