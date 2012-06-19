@@ -62,17 +62,17 @@ void send_status_pc()
 
 	// Construct the message to the BeagleBoard based on state of the sub.
 	// get heading value
-	avnav_temp = pc.encode_avnav(calcP);
+	avnav_temp = pc.encode_avnav(calcH;
 	pc.mes[1] = avnav_temp.byte1;
 	pc.mes[2] = avnav_temp.byte2;
 	
 	// get depth (pressure sensor) value
-	avnav_temp = pc.encode_avnav((int)(gyrX - MU_X_GYR));
+	avnav_temp = pc.encode_avnav(depth);
 	pc.mes[4] = avnav_temp.byte1;
 	pc.mes[5] = avnav_temp.byte2;
 	
 	// get power (motor) value
-	avnav_temp = pc.encode_avnav(accP);
+	avnav_temp = pc.encode_avnav(desPower);
 	pc.mes[7] = avnav_temp.byte1;
 	pc.mes[8] = avnav_temp.byte2;
 	
