@@ -9,17 +9,17 @@
 
 
  // Average values with IMU on flat surface.
-#define MU_X_ACC 19.649073
-#define MU_Y_ACC 23.955777
-#define MU_Z_ACC 206.435093
+#define MU_X_ACC 15.727786
+#define MU_Y_ACC 7.390691
+#define MU_Z_ACC (207.456982 - 256.0f)
 
-#define MU_X_GYR -261.045649
-#define MU_Y_GYR -53.883024
-#define MU_Z_GYR 263.740371
+#define MU_X_GYR -277.325811
+#define MU_Y_GYR -52.012694
+#define MU_Z_GYR 251.057828
 
-#define MU_X_COM -282.720280
-#define MU_Y_COM -113.902098
-#define MU_Z_COM -33.027972
+#define MU_X_COM -41.903232
+#define MU_Y_COM 8.644656
+#define MU_Z_COM -159.537379
 
 
 //the following values are old and might have to be updated. used in Daniel's Kalman

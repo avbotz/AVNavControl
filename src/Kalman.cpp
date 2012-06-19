@@ -27,7 +27,7 @@ Kalman::~Kalman() {
 }
 
 /*
- * Evaluate a kalman filter. The math here has been proven solid. Don't touch
+ * Evaluate a kalman filter. The math here has been proven solid. Don't touhc
  * it unless you really need to.
  */
 float Kalman::calculate(int gyroReading, float accTheta) {
