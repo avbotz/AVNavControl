@@ -1,7 +1,7 @@
 #include "pid.h"
 
-Kalman pitchK(PITCH_BIAS);
-Kalman rollK(ROLL_BIAS);
+Kalman pitchK(MU_X_GYR);
+Kalman rollK(MU_Y_GYR);
 
 float calcP, calcH, calcR;
 float accP, accR;
@@ -85,16 +85,23 @@ void do_pid() {
 	// |--old--|--__--|new
 
 	fAccX = (fAccX + 2 * accX) / 3;
-	fAccX = (fAccX + 2 * accX) / 3;
-	fAccX = (fAccX + 2 * accX) / 3;
+	fAccY = (fAccY + 2 * accY) / 3;
+	fAccZ = (fAccZ + 2 * accZ) / 3;
 	fGyrZ = (fGyrZ + 2 * gyrZ) / 3;
 
 	//based on the orientation of the sensors, tan(pitch) = y/z and tan(roll) = x/z
-	//im not too sure why daniel calculated roll because we have no way of correcting for it
 
-	accP = atan2((fAccY - MU_Y_ACC), (fAccZ - MU_Z_ACC)) * 57.3f; //57.3 is 180/PI, converting from radians to degrees
+	//accP = (fabs(fAccY - MU_Y_ACC) < 10 && fabs(fAccZ - MU_Z_ACC) < 10)?0:atan2((fAccY - MU_Y_ACC), (fAccZ - MU_Z_ACC)) * 57.3f; //57.3 is 180/PI, converting from radians to degrees
+	accP = atan2((fAccY - MU_Y_ACC), (fAccZ - MU_Z_ACC)) * 57.3f;
 	accR = atan2((fAccX - MU_X_ACC), (fAccZ - MU_Z_ACC)) * 57.3f;
-
+	/*
+	if (accP >= 0) {
+		accP = 180 - accP;
+	}
+	else {
+		accP = -180 - accP;
+	}*/
+	
 	//use the kalman filters on pitch and roll and just adjust heading
 	calcP = pitchK.calculate(gyrX, accP);
 	calcR = rollK.calculate(gyrY, accR);

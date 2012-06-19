@@ -45,9 +45,6 @@
 #define D_TI (DEPTH_KP/DEPTH_KI)
 #define D_TD (DEPTH_KD/DEPTH_KP)
 
-#define PITCH_BIAS -493.0f
-#define ROLL_BIAS -496.5f
-
 
 //ifndef used because it is defined in
 //two seperate places and im not too sure

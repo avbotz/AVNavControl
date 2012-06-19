@@ -4,18 +4,18 @@
 #include "mbed.h"
 
 #define GYR_SCALE	1/14.375f  //degrees per LSB
-#define SAMPLES_PER_SECOND 100  //measured in Hz
+#define SAMPLES_PER_SECOND 70  //measured in Hz
 #define DT 1.0f/SAMPLES_PER_SECOND
 
 
  // Average values with IMU on flat surface.
-#define MU_X_ACC -5.908784
-#define MU_Y_ACC -8.193536
-#define MU_Z_ACC 256.361888
+#define MU_X_ACC 15.727786
+#define MU_Y_ACC 7.390691
+#define MU_Z_ACC (207.456982 - 256.0f)
 
-#define MU_X_GYR -47.490779
-#define MU_Y_GYR 16.386080
-#define MU_Z_GYR 79.5
+#define MU_X_GYR -277.325811
+#define MU_Y_GYR -52.012694
+#define MU_Z_GYR 251.057828
 
 #define MU_X_COM -41.903232
 #define MU_Y_COM 8.644656
@@ -72,7 +72,7 @@ private:
 	 * from the accelerometer. Both R and Q need to be updated for the new IMU.
 	 * See http://en.wikipedia.org/wiki/Kalman_filter#Estimation_of_the_noise_covariances_Qk_and_Rk
 	 */
-	static const float R_angle = 15.0f;
+	static const float R_angle = 25.0f;
 
 
 	static const float SCALE = 1/14.375f;

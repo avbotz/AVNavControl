@@ -27,7 +27,7 @@ Kalman::~Kalman() {
 }
 
 /*
- * Evaluate a kalman filter. The math here has been proven solid. Don't touch
+ * Evaluate a kalman filter. The math here has been proven solid. Don't touhc
  * it unless you really need to.
  */
 float Kalman::calculate(int gyroReading, float accTheta) {
@@ -35,7 +35,7 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	 * Update the predicted angle based on the previous
 	 * angle and the new gyroscope reading.
 	 */
-	angle = angle - (bias + gyroReading) * DT * SCALE;
+	angle = angle - (bias - gyroReading) * DT * SCALE;
 	
 	//dAngle = dAngle - (dBias + gyroReading) * DT * SCALE;
 
@@ -94,7 +94,7 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	dGain[1] = dP[1][0] / dE;
 	*/
 	
-	gain[0] = P[0][0] / E;
+	gain[0] = P[0][0] * DT / E;
 	gain[1] = P[1][0] / E;
 	
 
