@@ -12,6 +12,9 @@
 #define MU_X_ACC 15.727786
 #define MU_Y_ACC 7.390691
 #define MU_Z_ACC (207.456982 - 256.0f)
+// Subtract 256 in the Z direction to account for gravity. According to IMU data
+// sheet, the sensitivity at 2g mode (which is what we are using) is
+// 256 least significant bits per 1 g. Normal Earth gravity = 1 g.
 
 #define MU_X_GYR -277.325811
 #define MU_Y_GYR -52.012694
