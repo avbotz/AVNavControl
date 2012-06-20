@@ -62,7 +62,7 @@ void send_status_pc()
 
 	// Construct the message to the BeagleBoard based on state of the sub.
 	// get heading value
-	avnav_temp = pc.encode_avnav(calcH;
+	avnav_temp = pc.encode_avnav(calcH);
 	pc.mes[1] = avnav_temp.byte1;
 	pc.mes[2] = avnav_temp.byte2;
 	
