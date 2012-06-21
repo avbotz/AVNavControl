@@ -54,21 +54,10 @@ void PID::reset()
 
 float PID::calculate_i()
 {
-	// only if the term is outside the bounds, then just add the bound its outside of
-	// instead of adding the actual value which would throw off the integral term like crazy
-
-	if (_processValue > _inputMax) {
-		_integral += _inputMax * _dt;
-	}
-	else if (_processValue < _inputMin) {
-		_integral += _inputMin * _dt;
-	}
-	else {
-		_integral += _scaledInput * _dt;
-	}
-
+	_integral += _scaledInput * _dt;
 	return _integral;
 }
+
 float PID::calculate_d()
 {
 	return (_scaledInput - _last) / _dt;

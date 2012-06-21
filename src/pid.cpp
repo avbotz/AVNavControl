@@ -45,7 +45,7 @@ void init_pid() {
 	headingPID->setGains(HEADING_KP, HEADING_KI, HEADING_KD);
 	depthPID->setGains(DEPTH_KP, DEPTH_KI, DEPTH_KD);
 
-	pitchPID->setBounds(-30,30); //basically if ur more than 45 degrees off dont overcompensate too  much
+	pitchPID->setBounds(-30,30); //basically if you're more than 30 degrees off don't overcompensate too much
 	headingPID->setBounds(-180,180); //same as above
 	depthPID->setBounds(-6,6); //6 inches
 
@@ -55,7 +55,7 @@ void init_pid() {
 	headingPID->setSetpoint(0.0f);
 	depthPID->setSetpoint(0.0f);
 	
-	//we scale so that we dont have to after calculating pid
+	//we scale so that we don't have to after calculating pid
 	//the scales are the same as Daniel's
 
 	headingPID->setScale(1.0f/180);
@@ -91,20 +91,14 @@ void do_pid() {
 
 	//based on the orientation of the sensors, tan(pitch) = y/z and tan(roll) = x/z
 
-	//accP = (fabs(fAccY - MU_Y_ACC) < 10 && fabs(fAccZ - MU_Z_ACC) < 10)?0:atan2((fAccY - MU_Y_ACC), (fAccZ - MU_Z_ACC)) * 57.3f; //57.3 is 180/PI, converting from radians to degrees
+	//57.3 is 180/PI, converting from radians to degrees
 	accP = atan2((fAccY - MU_Y_ACC), (fAccZ - MU_Z_ACC)) * 57.3f;
 	accR = atan2((fAccX - MU_X_ACC), (fAccZ - MU_Z_ACC)) * 57.3f;
-	/*
-	if (accP >= 0) {
-		accP = 180 - accP;
-	}
-	else {
-		accP = -180 - accP;
-	}*/
 	
 	//use the kalman filters on pitch and roll and just adjust heading
 	calcP = pitchK.calculate(gyrX, accP);
-	calcR = rollK.calculate(gyrY, accR);
+	//calcR = rollK.calculate(gyrY, accR);	We don't have any way to fix it, why bother? :(
+	//TODO: add more motors
 	//because positive is CCW for the IMU and we treat it as positive with motors
 	calcH += (MU_Z_GYR - fGyrZ) * GYR_SCALE * DT;
 
@@ -119,17 +113,22 @@ void do_pid() {
 	dHS = desHead - 360;
 	dHA = desHead;
 	dHB = desHead + 360;
-	if ( (fabs(dHA - calcH) < fabs(dHB - calcH)) && (fabs(dHA - calcH) < fabs(dHS - calcH)) ) {	 //makes sure its using the smallest interval to get
-		dHC = dHA;																				  //to the desired heading so going from 2  359 goes
-	}																							   //a few degrees CCW instead of going all
-	else if (fabs(dHB - calcH) < fabs(dHS - calcH)) {											   //the way around CW
+	
+	/*
+	 * This block of code ensures that we use the smallest interval to get to the desired heading.
+	 * For example, going from h=2 to h=359 moves CCW 3 degrees instead of CW 357 degrees.
+	 */
+	if ( (fabs(dHA - calcH) < fabs(dHB - calcH)) && (fabs(dHA - calcH) < fabs(dHS - calcH)) ) {	
+		dHC = dHA;																				  
+	}																							   
+	else if (fabs(dHB - calcH) < fabs(dHS - calcH)) {	
 		dHC = dHB;
 	}
 	else {
-		dHC = dHA;
+		dHC = dHS;
 	}
 
-	//dont attempt to correct heading if less than 5 degrees off, just move
+	//don't attempt to correct heading if less than 5 degrees off, just move
 	if (fabs(dHC-calcH) < 5) {
 		isTurn = false;
 		isMove = true;
@@ -139,20 +138,21 @@ void do_pid() {
 		isTurn = true;
 		isMove = true;
 	}
-	//if too far off then dont move, just turn
+	//if too far off then don't move, just turn
 	else {
 		isTurn = true;
 		isMove = false;
 	}
-	float headError = dHC - calcH;
-	
-	headingPID->setProcessValue(headError);
-	
-	float depthError = desDepth - depth;
-	depthPID->setProcessValue(depthError);
 	//always correct for pitch
 	isPitch = true;
+	
+	float headError = dHC - calcH;
+	float depthError = desDepth - depth;
+	
+	headingPID->setProcessValue(headError);
+	depthPID->setProcessValue(depthError);
 	pitchPID->setProcessValue(calcP);
+	
 	hpid = headingPID->calculate();
 	dpid = depthPID->calculate();
 	ppid = pitchPID->calculate();
@@ -169,7 +169,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 	float motorSpeed[4];
 	float forwardPower, pitchPower;
 
-	//desPower is between 0 and 200 i think where 0 is full backward and 200 is full forward
+	//desPower is between 0 and 200, 0 is full speed backwards, extrapolate.
 	forwardPower = (100 - desPower) * 0.01f * (1 - fabs(hpid));
 	pitchPower = ppid * (1 - fabs(dpid));
 	//right motor is more powerful than left, back motor is runs in reverse of the others
@@ -177,7 +177,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 		motorSpeed[LEFT] = hpid + forwardPower;
 		motorSpeed[RIGHT] = -hpid + forwardPower;
 	}
-	else if (!isMove && isTurn) {
+	else if (isTurn) {
 		motorSpeed[LEFT] = hpid;
 		motorSpeed[RIGHT] = -hpid;
 	}

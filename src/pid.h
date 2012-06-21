@@ -33,19 +33,6 @@
 #define DEPTH_KI 0.0f
 #define DEPTH_KD 0.0f
 
-#define P_KC PITCH_KP
-#define P_TI (PITCH_KP/PITCH_KI)
-#define P_TD (PITCH_KD/PITCH_KP)
-
-#define H_KC HEADING_KP
-#define H_TI (HEADING_KP/HEADING_KI)
-#define H_TD (HEADING_KD/HEADING_KP)
-
-#define D_KC DEPTH_KP
-#define D_TI (DEPTH_KP/DEPTH_KI)
-#define D_TD (DEPTH_KD/DEPTH_KP)
-
-
 //ifndef used because it is defined in
 //two seperate places and im not too sure
 //who includes who
