@@ -20,8 +20,9 @@ AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
  * That was based on the dsPIC33FJ family's ADC converter.
  * Also he used linear regression to convert depth sensor voltage to feet
  * Adding 0.5 so that it rounds correctly.
+ * The resistor that we're using on the pressure sensor is 2.2K ohms.
  */
-AnalogPressureSensor pressure(p17, 100.0f, 0.0f);
+AnalogPressureSensor pressure(p17, 317.14f, 73.371f);
 
 // UART mapping http://mbed.org/users/mbed714/notebook/uart-mapping/
 
