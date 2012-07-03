@@ -58,6 +58,7 @@ int PC::decode_avnav(avnav data) {
 
 void send_status_pc()
 {
+	depth = pressure.getValueCalibrated();
 	avnav avnav_temp;
 
 	// Construct the message to the BeagleBoard based on state of the sub.
@@ -79,7 +80,11 @@ void send_status_pc()
 	// get kill switch value
 	// TODO: is this correct? I assume voltage on kill pin means alive.
 	pc.mes[9] = kill.getValueThresh() ? 'k' : 'l';
-	
+	/*
+				char* tmp;
+			sprintf(tmp, "%d", pressure.getValueCalibrated());
+			pc.send_message(tmp);
+			delete tmp;*/
 	// print message to PC
 	pc.send_message(pc.mes);
 }

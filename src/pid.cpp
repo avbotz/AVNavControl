@@ -197,7 +197,8 @@ void update_motors(float hpid, float dpid, float ppid) {
 	}
 	int powerNum[4];
 	motorSpeed[RIGHT] *= .85; //because the right motor is stronger
-	motorSpeed[BACK] *= -1;  //because the back motor is backwards
+	//motorSpeed[BACK] *= -1;  //because the back motor is backwards
+	//motorSpeed[BACK] *= -1;
 	
 	//motorSpeed is a number around zero so the following scales them 0 - 254 which the motors require
 	for (int i = 0; i < 4; i++) {
