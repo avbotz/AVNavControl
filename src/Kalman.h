@@ -9,20 +9,20 @@
 
 
  // Average values with IMU on flat surface.
-#define MU_X_ACC 13.436997
-#define MU_Y_ACC 34.651475
-#define MU_Z_ACC (247.249330 - 256.0f)
+#define MU_X_ACC 6.045213
+#define MU_Y_ACC 32.776596
+#define MU_Z_ACC (247.565160 - 256.0f)
 // Subtract 256 in the Z direction to account for gravity. According to IMU data
 // sheet, the sensitivity at 2g mode (which is what we are using) is
 // 256 least significant bits per 1 g. Normal Earth gravity = 1 g.
 
-#define MU_X_GYR -62.418231
-#define MU_Y_GYR 17.678284
-#define MU_Z_GYR 14.471850
+#define MU_X_GYR -53.703457
+#define MU_Y_GYR 22.025266
+#define MU_Z_GYR 7.219415
 
-#define MU_X_COM -198.770777
-#define MU_Y_COM -51.745308
-#define MU_Z_COM 9.819035
+#define MU_X_COM -178.013298
+#define MU_Y_COM -109.119681
+#define MU_Z_COM 32.066489
 
 
 //the following values are old and might have to be updated. used in Daniel's Kalman

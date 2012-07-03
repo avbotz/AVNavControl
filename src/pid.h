@@ -55,6 +55,7 @@ extern PID* depthPID;
 
 extern int desHead, desDepth, desPower;
 extern volatile int depth;
+extern bool debug;
 
 extern unsigned char motorArray[4];
 

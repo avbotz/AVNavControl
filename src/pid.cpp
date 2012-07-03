@@ -70,6 +70,10 @@ void init_pid() {
 }
 
 void do_pid() {
+	if(debug) return;
+	//dammit adit
+	headingPID->setSetpoint(desHead);
+	depthPID->setSetpoint(desDepth);
 	float ppid, hpid, dpid;
 	
 	//check kill state, maybe reset
