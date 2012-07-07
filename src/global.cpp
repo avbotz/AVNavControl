@@ -13,6 +13,7 @@
 //analoginput.h
 // TODO: check the magic threshold 0.85f. Too high/low?
 AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
+//AnalogKillSwitch kill(p16, p18, 0.4f);
 
 /* 
  * TODO: adjust this calibration. it's almost certainly wrong. 100 is arbitrary.
@@ -44,3 +45,4 @@ DigitalOut led1(LED1),	// Kill status
            led4(LED4);	// debug
 
 bool debug = false;
+

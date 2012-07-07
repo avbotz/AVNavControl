@@ -70,7 +70,7 @@ void init_pid() {
 }
 
 void do_pid() {
-	if(debug) return;
+	//if(debug || kill.getValueThresh()) return;
 	//dammit adit
 	headingPID->setSetpoint(desHead);
 	depthPID->setSetpoint(desDepth);
@@ -169,13 +169,16 @@ void get_compass() {
 
 }
 
+float ppower = 0;
+
 void update_motors(float hpid, float dpid, float ppid) {
 	float motorSpeed[4];
 	float forwardPower, pitchPower;
 
 	//desPower is between 0 and 200, 0 is full speed backwards, extrapolate.
-	forwardPower = (100 - desPower) * 0.01f * (1 - fabs(hpid));
+	forwardPower = (100 - desPower) * 0.02f * (1 - fabs(hpid));
 	pitchPower = ppid * (1 - fabs(dpid));
+	ppower = pitchPower;
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
 		motorSpeed[LEFT] = hpid + forwardPower;
@@ -192,8 +195,8 @@ void update_motors(float hpid, float dpid, float ppid) {
 	
 	if (isPitch) {
 		//signs probably arent correct
-		motorSpeed[FRONT] = dpid + pitchPower;
-		motorSpeed[BACK] = dpid - pitchPower;
+		motorSpeed[FRONT] = -dpid + pitchPower;
+		motorSpeed[BACK] = -dpid - pitchPower;
 	}
 	//should never be used cuz assume always pitched
 	else {

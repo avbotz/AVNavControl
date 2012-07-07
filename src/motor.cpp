@@ -38,6 +38,7 @@ void Motor::putc(char c) {
 }
 
 void motor_send_wrapper() {
+	//if (!kill.getValueThresh()) return;
 	motor.send();
 }
 

@@ -10,6 +10,7 @@
 
 #include "pid_library.h"
 #include "Kalman.h"
+#include "analog.h"
 
 #ifndef NULL
 #define NULL 0
@@ -21,7 +22,7 @@
 //are the ones used by the mbed, they
 //are different and not intuitive
 
-#define PITCH_KP 0.05f
+#define PITCH_KP 0.01f
 #define PITCH_KI 0.0f
 #define PITCH_KD 0.0f
 
@@ -29,8 +30,8 @@
 #define HEADING_KI 0.2f
 #define HEADING_KD 0.0f
 
-#define DEPTH_KP 0.5f
-#define DEPTH_KI 0.0f
+#define DEPTH_KP 0.8f
+#define DEPTH_KI 0.05f
 #define DEPTH_KD 0.0f
 
 //ifndef used because it is defined in
@@ -58,6 +59,7 @@ extern volatile int depth;
 extern bool debug;
 
 extern unsigned char motorArray[4];
+extern AnalogKillSwitch kill;
 
 void reset_pid();
 void init_pid();

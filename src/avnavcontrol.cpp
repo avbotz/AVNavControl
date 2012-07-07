@@ -42,6 +42,7 @@ int main() {
 	//print_serial(&pc, "hi");
 	
 	while (true) {
+		//if (kill.getValueThresh()) continue;
 		//led1 = isAlive = kill.getValueThresh();
 		//led2 = !led2;
 		if (true) {
@@ -73,7 +74,7 @@ int main() {
 	
 			if (debug) {
 				char in;
-				while (in = pc.readPC()) {
+				while ((in = pc.readPC())) {
 					// TODO: this should be used to handle message from AVI
 					// Format for messages from AVI is com prefix, data byte 1, data byte 2, '\n'
 					// where com prefix is h for desired heading, d for desired depth,
@@ -163,7 +164,6 @@ int main() {
 									imu.getData();
 								}
 							}
-							unsigned long long i = 0;
 							// String to store the information message for PC.
 							char* calibration_message = new char[200];
 							// Print a formatted message to the string.

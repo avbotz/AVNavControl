@@ -43,6 +43,7 @@ int AnalogPressureSensor::getValueCalibrated() {
 AnalogKillSwitch::AnalogKillSwitch(PinName Vin, PinName Vout, float thresh) :
 AnalogInput(Vin) {
 	threshold = thresh;
+	value = thresh;
 	p_Vout = new AnalogOut(Vout);
 	p_Vout->write(1.0f); // 1.0 * 3.3 volts
 }

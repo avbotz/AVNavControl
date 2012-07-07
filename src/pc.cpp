@@ -55,6 +55,7 @@ int PC::decode_avnav(avnav data) {
 	return ((data.byte1 - 0x20) << 6) | (data.byte2 - 0x20);
 }
 
+extern float ppower;
 
 void send_status_pc()
 {
@@ -63,17 +64,17 @@ void send_status_pc()
 
 	// Construct the message to the BeagleBoard based on state of the sub.
 	// get heading value
-	avnav_temp = pc.encode_avnav(motorArray[1]);	//back motor
+	avnav_temp = pc.encode_avnav(calcH);	//back motor
 	pc.mes[1] = avnav_temp.byte1;
 	pc.mes[2] = avnav_temp.byte2;
 	
 	// get depth (pressure sensor) value
-	avnav_temp = pc.encode_avnav(motorArray[2]);	//front motor
+	avnav_temp = pc.encode_avnav(depth);	//front motor
 	pc.mes[4] = avnav_temp.byte1;
 	pc.mes[5] = avnav_temp.byte2;
 	
 	// get power (motor) value
-	avnav_temp = pc.encode_avnav(depth);
+	avnav_temp = pc.encode_avnav(desPower);
 	pc.mes[7] = avnav_temp.byte1;
 	pc.mes[8] = avnav_temp.byte2;
 	
