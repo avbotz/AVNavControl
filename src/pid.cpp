@@ -52,8 +52,8 @@ void init_pid() {
 	//initially we are just trying to stay at the initial state
 
 	pitchPID->setSetpoint(0.0f);
-	headingPID->setSetpoint(0.0f);
-	depthPID->setSetpoint(0.0f);
+	headingPID->setSetpoint(desHead);
+	depthPID->setSetpoint(desDepth);
 	
 	//we scale so that we don't have to after calculating pid
 	//the scales are the same as Daniel's
@@ -169,8 +169,6 @@ void get_compass() {
 
 }
 
-float ppower = 0;
-
 void update_motors(float hpid, float dpid, float ppid) {
 	float motorSpeed[4];
 	float forwardPower, pitchPower;
@@ -178,7 +176,6 @@ void update_motors(float hpid, float dpid, float ppid) {
 	//desPower is between 0 and 200, 0 is full speed backwards, extrapolate.
 	forwardPower = (100 - desPower) * 0.02f * (1 - fabs(hpid));
 	pitchPower = ppid * (1 - fabs(dpid));
-	ppower = pitchPower;
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
 		motorSpeed[LEFT] = hpid + forwardPower;

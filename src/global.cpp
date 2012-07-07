@@ -15,7 +15,6 @@
 AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
 
 /* 
- * TODO: adjust this calibration. it's almost certainly wrong. 100 is arbitrary.
  * Daniel's was depth = adc_buffer[ADC_PRESS] * 0.361904762 - 101.33333;
  * That was based on the dsPIC33FJ family's ADC converter.
  * Also he used linear regression to convert depth sensor voltage to feet

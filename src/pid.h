@@ -6,11 +6,9 @@
 #ifndef PID_H
 #define PID_H
 
-#include <cmath>
-
 #include "pid_library.h"
 #include "Kalman.h"
-#include "analog.h"
+#include "motor.h"
 
 #ifndef NULL
 #define NULL 0
@@ -33,16 +31,6 @@
 #define DEPTH_KP 0.8f
 #define DEPTH_KI 0.05f
 #define DEPTH_KD 0.0f
-
-//ifndef used because it is defined in
-//two seperate places and im not too sure
-//who includes who
-#ifndef LEFT
-#define LEFT 0
-#define RIGHT 1
-#define FRONT 2
-#define BACK 3
-#endif
 
 extern Kalman pitchK, rollK;
 

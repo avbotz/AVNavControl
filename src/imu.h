@@ -2,8 +2,6 @@
 #define _IMU_H
 
 #include "mbed.h"
-#include <string>
-#include <sstream>
 #include <limits.h>
 
 #include "debug.h"

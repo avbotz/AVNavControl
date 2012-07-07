@@ -4,13 +4,7 @@
 #define AVNAVCONTROL_H
 
 #include "mbed.h"
-
-#include "analog.h"
 #include "imu.h"
-#include "motor.h"
-#include "pid.h"
-#include "debug.h"
-#include "pc.h"
 
 extern void send_to_pc();
 void readIMU(), readPC(), sendPC(), sendMotor();

@@ -3,23 +3,15 @@
 
 #include "mbed.h"
 #include <string>
-#include <sstream>
-#include "debug.h"
-#include "Kalman.h"
 #include "analog.h"
 
 #define SYNC_BYTE 255
 #define MOTOR_TX_BUF_SIZE 1024
 
-//ifndef used because it is defined in
-//two seperate places and im not too sure
-//who includes who
-#ifndef LEFT
 #define LEFT 0
 #define RIGHT 1
 #define FRONT 2
 #define BACK 3
-#endif
 
 void tx_interrupt_motor();
 void motor_send_wrapper();
