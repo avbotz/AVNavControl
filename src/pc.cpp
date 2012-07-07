@@ -3,6 +3,9 @@
 
 PC::PC(PinName tx, PinName rx, int baud)
 {
+	desired_power = 100;
+	desired_heading = 0;
+	desired_depth = 20;
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
 
