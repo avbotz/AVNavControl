@@ -189,6 +189,17 @@ int main() {
 							imu.directAccess();
 							manual = false;
 							break;
+						case 'k':
+						{
+							char killinfo[20];
+							while (true) {
+								sprintf(killinfo, "kill: %f\n\r", kill.getValueRaw());
+								pc.send_message(killinfo);
+								tx_interrupt_pc();
+								wait_ms(1000);
+							}
+							break;
+						}
 						default:
 							pc.send_message("Unrecognized command.\n\r");
 						break;
