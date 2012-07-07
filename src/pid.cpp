@@ -223,10 +223,10 @@ void update_motors(float hpid, float dpid, float ppid) {
 		}
 	}
 
-	motorArray[LEFT] = powerNum[LEFT];
-	motorArray[RIGHT] = powerNum[RIGHT];
-	motorArray[FRONT] = powerNum[FRONT];
-	motorArray[BACK] = powerNum[BACK];
+	motorArray[LEFT] = kill.getValueThresh()?powerNum[LEFT]:127;
+	motorArray[RIGHT] = kill.getValueThresh()?powerNum[RIGHT]:127;
+	motorArray[FRONT] = kill.getValueThresh()?powerNum[FRONT]:127;
+	motorArray[BACK] = kill.getValueThresh()?powerNum[BACK]:127;
 }
 
 
