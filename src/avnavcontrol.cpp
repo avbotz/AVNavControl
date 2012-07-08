@@ -47,11 +47,13 @@ int main() {
 		}
 		if (pc.tx_empty) {
 			tx_interrupt_pc();
-		}		
-		//if (kill.getValueThresh()) continue;
-		//led1 = isAlive = kill.getValueThresh();
-		//led2 = !led2;
+		}
+		
+		// Set isAlive and led1 to the current kill state.
+		led1 = isAlive = kill.getValueThresh();
+		
 		imu.getData();
+		
 		if (!debug) {
 			pc.readPC();
 			desHead = pc.desired_heading;

@@ -37,7 +37,7 @@ IMU imu(p9, p10, 57600, &pc);
 // pins 13, 14 = UART 1
 Motor motor(4, 9600, p13, p14);
 
-DigitalOut led1(LED1),	// Kill status
+DigitalOut led1(LED1),	// Kill status. On means alive.
            led2(LED2),	// debug
            led3(LED3),	// debug
            led4(LED4);	// debug
