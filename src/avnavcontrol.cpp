@@ -8,20 +8,18 @@ unsigned char motorArray[4];
 
 
 int main() {
-
 	init_pid();
-
+	
 	//attach the pc interrupts
 	pc.p_device->attach(&rx_interrupt_pc, Serial::RxIrq);
 	pc.p_device->attach(&tx_interrupt_pc, Serial::TxIrq);
-
+	
 	//attach motor interrupt
 	motor.p_device->attach(&tx_interrupt_motor, Serial::TxIrq);
-
+	
 	//attach imu interrupt
 	imu.p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
-
-
+	
 	//create the tickers here
 	Ticker tick[3];
 	if (!debug) {
@@ -29,15 +27,6 @@ int main() {
 	}
 	tick[1].attach(&do_pid, DT);
 	tick[2].attach(&motor_send_wrapper, DT/2);
-
-	// poll devices
-	// imu
-	// kill & pressure
-	// kalman
-	// pid
-
-	// every 1s: send data to pc
-	// upon serial from pc: set desired heading and desired depth
 	
 	while (true) {
 		led3 = !led3;
@@ -103,9 +92,11 @@ int main() {
 						delete time;
 						break;
 					}
+					
 					case 'i':	// Act as a passthrough between IMU and PC
 						imu.directAccess();
 						break;
+						
 					case 'k':
 					{
 						char killinfo[20];
@@ -117,9 +108,10 @@ int main() {
 						}
 						break;
 					}
-					default:
+					
+					default:	// The user typed a key we didn't understand.
 						pc.send_message("Unrecognized command.\n\r");
-					break;
+						break;
 				}
 			}
 		}
