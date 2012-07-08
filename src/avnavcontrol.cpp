@@ -40,8 +40,6 @@ int main() {
 	// upon serial from pc: set desired heading and desired depth
 	
 	while (true) {
-		led3 = !led3;
-
 		if (motor.buffer_empty) {
 			tx_interrupt_motor();
 		}
