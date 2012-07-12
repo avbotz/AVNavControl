@@ -1,4 +1,4 @@
-//plug everything in to the right pins plz
+//plug everything in to the right pins please
 
 #ifndef AVNAVCONTROL_H
 #define AVNAVCONTROL_H
