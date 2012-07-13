@@ -12,6 +12,7 @@
 #define RIGHT 1
 #define FRONT 2
 #define BACK 3
+#define DROPPER 4
 
 void tx_interrupt_motor();
 void motor_send_wrapper();
