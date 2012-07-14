@@ -41,6 +41,7 @@ int main() {
 		//led1 = isAlive = kill.getValueThresh();
 		//led2 = !led2;
 		imu.getData();
+		// If we are running in normal (AKA production or competition) mode.
 		if (!debug) {
 			pc.readPC();
 			desHead = pc.desired_heading;
@@ -50,10 +51,13 @@ int main() {
 			for (int i = 0; i < 4; i++) {
 				motor.set(i, motorArray[i]);
 			}
-		}		
+		}
+		// Otherwise, we are running in debug mode.
 		else {
 			char in;
-			while ((in = pc.readPC())) {
+			while (true) {
+				// Get the character from the PC.
+				in = pc.readPC()
 				switch (in) {
 					case 'c':
 					{ // Braces here so that variables initialized in this case aren't visible from other cases.
