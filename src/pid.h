@@ -46,6 +46,8 @@ extern int desHead, desDepth, desPower;
 extern volatile int depth;
 extern bool debug;
 
+extern volatile bool isAlive;
+
 extern unsigned char motorArray[4];
 extern AnalogKillSwitch kill;
 

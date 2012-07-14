@@ -11,7 +11,7 @@ void readIMU(), readPC(), sendPC(), sendMotor();
 
 extern PC pc;
 
-bool isAlive = false;
+volatile bool isAlive = false;
 bool PCreadable, PCsendable;
 
 extern bool debug;

@@ -70,7 +70,7 @@ void init_pid() {
 }
 
 void do_pid() {
-	//if(debug || kill.getValueThresh()) return;
+	//if(debug || isAlive) return;
 	//dammit adit
 	headingPID->setSetpoint(desHead);
 	depthPID->setSetpoint(desDepth);
@@ -219,16 +219,20 @@ void update_motors(float hpid, float dpid, float ppid) {
 			powerNum[i] = 127;
 		}
 	}
-
-	motorArray[LEFT] = kill.getValueThresh()?powerNum[LEFT]:127;
-	motorArray[RIGHT] = kill.getValueThresh()?powerNum[RIGHT]:127;
-	motorArray[FRONT] = kill.getValueThresh()?powerNum[FRONT]:127;
-	motorArray[BACK] = kill.getValueThresh()?powerNum[BACK]:127;
+	
+	// If the sub is dead, then turn the motors off. Otherwise, set them to
+	// the values that came out of PID.
+	// Note: When the sub is dead, the kill switch actually cuts power to the
+	// motors, so they stop moving. This is here so that the motors don't start
+	// moving when the sub is unkilled (alive) until we want them to.
+	motorArray[LEFT] = isAlive ? powerNum[LEFT] : 127;
+	motorArray[RIGHT] = isAlive ? powerNum[RIGHT] : 127;
+	motorArray[FRONT] = isAlive ? powerNum[FRONT] : 127;
+	motorArray[BACK] = isAlive ? powerNum[BACK] : 127;
 }
 
 
 void give_data(int accx, int accy, int accz, int gyrx, int gyry, int gyrz) {
-
 	accX = accx;
 	accY = accy;
 	accZ = accz;

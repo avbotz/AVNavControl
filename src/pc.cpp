@@ -83,7 +83,7 @@ void send_status_pc()
 	
 	// get kill switch value
 	// TODO: is this correct? I assume voltage on kill pin means alive.
-	pc.mes[9] = kill.getValueThresh() ? 'k' : 'l';
+	pc.mes[9] = isAlive ? 'k' : 'l';
 	/*
 				char* tmp;
 			sprintf(tmp, "%d", pressure.getValueCalibrated());
