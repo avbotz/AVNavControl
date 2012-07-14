@@ -97,13 +97,19 @@ int main() {
 						imu.directAccess();
 						break;
 						
-					case 'k':
+					case 'k':	// Print kill switch data.
 					{
+						// Buffer to hold the message.
 						char killinfo[20];
+						// Loop until reset
 						while (true) {
+							// Fill the buffer with the message
 							sprintf(killinfo, "kill: %f\n\r", kill.getValueRaw());
+							// Safely send the buffer to the PC.
 							pc.send_message(killinfo);
+							// Make it flush the PC buffer.
 							tx_interrupt_pc();
+							// Wait 1s between each message.
 							wait_ms(1000);
 						}
 						break;
