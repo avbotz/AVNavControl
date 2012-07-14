@@ -1,8 +1,11 @@
+// "PID without a PhD" explains PID quite well: 
+// <http://www.eetimes.com/design/embedded/4211211/PID-without-a-PhD>
+// Look at the PDF version linked from that page if you want pictures with your
+// words.
 
 class PID
 {
 public:
-
 	//adjustments order: bias->bounds->scale
 
 	void setGains(float kp, float ki, float kd);
@@ -16,8 +19,8 @@ public:
 	float calculate();
 	void reset();
 	void scale_input();
+	
 private:
-
 	float calculate_i();
 	float calculate_d();
 
