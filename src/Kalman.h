@@ -3,12 +3,11 @@
 
 #include "mbed.h"
 
-#define GYR_SCALE	1/14.375f  //degrees per LSB
+#define GYRO_SCALE	1/14.375f  //degrees per LSB
 #define SAMPLES_PER_SECOND 70  //measured in Hz
 #define DT 1.0f/SAMPLES_PER_SECOND
 
-
- // Average values with IMU on flat surface.
+// Average values with IMU on flat surface.
 #define MU_X_ACC -7.455526
 #define MU_Y_ACC 30.711590
 #define MU_Z_ACC (248.227763 - 256.0f)
@@ -46,8 +45,6 @@ private:
 	P[2][2],    // covariance
 	E,          // error estimate
 	gain[2];    // Kalman filter gains
-	
-	//float dAngle, dBias, dAngle_err, dP[2][2], dE, dGain[2];
 
 	/*
 	 * Q is a 2x2 matrix of the covariance of the process noise. Because we
@@ -70,12 +67,6 @@ private:
 	 * See http://en.wikipedia.org/wiki/Kalman_filter#Estimation_of_the_noise_covariances_Qk_and_Rk
 	 */
 	static const float R_angle = 25.0f;
-
-
-	static const float SCALE = 1/14.375f;
-	//probably needs to be changed for new IMU. maybe pass in via constructor?
-	//I'm pretty sure this is the same thing as GYRO_SCALE in main.cpp, although the numbers
-	//are surprisingly different
 
 };
 

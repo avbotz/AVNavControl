@@ -35,7 +35,7 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	 * Update the predicted angle based on the previous
 	 * angle and the new gyroscope reading.
 	 */
-	angle = angle - (bias - gyroReading) * DT * SCALE;
+	angle = angle - (bias - gyroReading) * DT * GYRO_SCALE;
 
 	/*
 	 * angle_err is the actual error between the predicted

@@ -104,7 +104,7 @@ void do_pid() {
 	//calcR = rollK.calculate(gyrY, accR);	We don't have any way to fix it, why bother? :(
 	//TODO: add more motors
 	//because positive is CCW for the IMU and we treat it as positive with motors
-	calcH += (MU_Z_GYR - fGyrZ) * GYR_SCALE * DT;
+	calcH += (MU_Z_GYR - fGyrZ) * GYRO_SCALE * DT;
 
 	//360 degrees in a circle so we want our heading between 0 and 360
 	if (calcH >= 360) {
@@ -219,20 +219,21 @@ void update_motors(float hpid, float dpid, float ppid) {
 			powerNum[i] = 127;
 		}
 	}
-	
-	// If the sub is dead, then turn the motors off. Otherwise, set them to
-	// the values that came out of PID.
-	// Note: When the sub is dead, the kill switch actually cuts power to the
-	// motors, so they stop moving. This is here so that the motors don't start
-	// moving when the sub is unkilled (alive) until we want them to.
-	motorArray[LEFT] = kill.getValueThresh() ? powerNum[LEFT] : 127;
-	motorArray[RIGHT] = kill.getValueThresh() ? powerNum[RIGHT] : 127;
-	motorArray[FRONT] = kill.getValueThresh() ? powerNum[FRONT] : 127;
-	motorArray[BACK] = kill.getValueThresh() ? powerNum[BACK] : 127;
+
+       // If the sub is dead, then turn the motors off. Otherwise, set them to
+       // the values that came out of PID.
+       // Note: When the sub is dead, the kill switch actually cuts power to the
+       // motors, so they stop moving. This is here so that the motors don't start
+       // moving when the sub is unkilled (alive) until we want them to.
+       motorArray[LEFT] = kill.getValueThresh() ? powerNum[LEFT] : 127;
+       motorArray[RIGHT] = kill.getValueThresh() ? powerNum[RIGHT] : 127;
+       motorArray[FRONT] = kill.getValueThresh() ? powerNum[FRONT] : 127;
+       motorArray[BACK] = kill.getValueThresh() ? powerNum[BACK] : 127;
 }
 
 
 void give_data(int accx, int accy, int accz, int gyrx, int gyry, int gyrz) {
+
 	accX = accx;
 	accY = accy;
 	accZ = accz;
