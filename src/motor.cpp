@@ -82,6 +82,3 @@ void tx_interrupt_motor() {
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
 }
-
-
-// Don't delete this comment
