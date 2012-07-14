@@ -9,8 +9,6 @@ PC::PC(PinName tx, PinName rx, int baud)
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
 
-	// Set an interrupt to send data to the BeagleBoard every 1.0 seconds.
-
 	for (int i = 0; i < PC_BUFFER_SIZE; i++) {
 		rx_buffer[i] = tx_buffer[i] = 0;
 	}
@@ -21,7 +19,7 @@ PC::PC(PinName tx, PinName rx, int baud)
 	tx_empty = true;
 
 
-	/*
+/*
  * This is the buffer for the message that will be sent to the BeagleBoard.
  * Format: 'h', AVNav-encoded data for heading,
  *         'd', AVNav-encoded data for depth (pressure sensor),
@@ -30,6 +28,10 @@ PC::PC(PinName tx, PinName rx, int baud)
  *         '\n' to terminate the message.
  */
 	mes = new char[12];
+	// Copy an initial message to the buffer. The pipe characters (|) will be
+	// replaced with AVNav-encoded numbers when this is actually used. We chose
+	// the pipe character because it cannot be confused with AVNav-encoded
+	// data -- see comments in encode_avnav().
 	strcpy(mes, "h||d||p|||\n");
 }
 
@@ -40,6 +42,7 @@ PC::PC(PinName tx, PinName rx, int baud)
 // - 0x20 ASCII space to 0x5f ASCII underscore (_) used for actually encoding
 //   data; and
 // - all the lowercase letters reserved for commands or control metadata.
+// 
 // This ensures that if a byte is dropped, it's unambiguous whether the next 
 // byte is a command or data. Downside is that the data is less human-readable,
 // but it's not like the BeagleBoard is a person or sentient being.
@@ -96,6 +99,8 @@ void send_status_pc()
 void PC::send_message(const char* message)
 {
 	int i = 0;
+	// Loop until message[i] becomes zero (null) because strings in C are
+	// terminated by a zero/null character.
 	while (message[i]) {
 		putc(message[i]);
 		i++;
