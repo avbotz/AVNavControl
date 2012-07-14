@@ -36,8 +36,6 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	 * angle and the new gyroscope reading.
 	 */
 	angle = angle - (bias - gyroReading) * DT * SCALE;
-	
-	//dAngle = dAngle - (dBias + gyroReading) * DT * SCALE;
 
 	/*
 	 * angle_err is the actual error between the predicted
@@ -45,8 +43,6 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	 */
 	angle_err = accTheta - angle;
 	
-	//dAngle_err = accTheta - dAngle;
-
 	/*
 	 * To calculate the predicted error in measuring
 	 * the angle, we add the maximum possible
@@ -62,7 +58,6 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	 * to save a floating-point operation.
 	 */
 	E = P[0][0] + R_angle;
-	//dE = dP[0][0] + R_angle;
 
 	/*
 	 * Compute the Kalman filter gains. From the Kalman paper:
@@ -89,10 +84,7 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	 *	  K<2,1> = K<2,1> - A<2,2> P<2,2> C'<2,1> inv(E)<1,1>
 	 *
 	 * I don't know why he does this.
-	 
-	dGain[0] = (dP[0][0] - dP[1][0] * DT) / dE;
-	dGain[1] = dP[1][0] / dE;
-	*/
+	 */
 	
 	gain[0] = P[0][0] * DT / E;
 	gain[1] = P[1][0] / E;
@@ -168,33 +160,12 @@ float Kalman::calculate(int gyroReading, float accTheta) {
 	 * We then multiply t by K0 and subtract the result from P.
 	 */
 
-	//These are ars_micropilot.c's equations for updating the covariance matrix. This is an extended Kalman filter.
+	//These are ars_micropilot.c's equations for updating the covariance matrix.
+	//This is an extended Kalman filter.
 	P[0][0] = P[0][0] - DT * (P[0][1] + P[1][0]) - gain[0] * P[0][0] + Q_angle;
 	P[0][1] = P[0][1] - DT * P[1][1] - gain[0] * P[0][1];
 	P[1][0] = P[1][0] - DT * P[1][1] - gain[1] * P[0][0];
 	P[1][1] = P[1][1] - gain[1] * P[0][1] + Q_gyro;
 	
-
-	/* These are Daniel's equations. He's using a variation of the Kalman filter that adds to the update equation:
-	 *
-	 *	  P = P + (Pdot + K*P*C) * dt
-	 * 
-	 * Dimensionally,
-	 *
-	 *	  K*P*C <2,2> = K<2,1> P<2,2> C<2,1>
-	 *
-	 * This affects only the P[0][0] and P[1][0] terms, K P C is 0 in the P[0][1] and P[1][1] terms.
-	 * I'm not sure what his rationale is for this addition.
-	 *
-	 * Also, Daniel may have placed a parentheses incorrectly. I believe the DT * P[1][1] term shouldn't be
-	 * within the DT * (terms), as I have no idea what a DT^2 would represent.
-	 
-	dP[0][0] = dP[0][0] - DT * (dP[1][0] - dP[0][1] + DT * dP[1][1]) - dGain[0] * dP[0][0] + DT * dGain[0] * dP[0][1] + Q_angle;
-	dP[0][1] = dP[0][1] - DT * P[1][1] - dGain[0] * dP[0][1];
-	dP[1][0] = dP[1][0] - DT * P[1][1] - dGain[1] * dP[0][0] + DT * dGain[1] * dP[0][1];
-	dP[1][1] = dP[1][1] - dGain[1] * dP[0][1] + Q_gyro;
-	*/
-	
-
 	return angle;
 }
