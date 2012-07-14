@@ -37,10 +37,9 @@ IMU imu(p9, p10, 57600, &pc);
 // pins 13, 14 = UART 1
 Motor motor(4, 9600, p13, p14);
 
-DigitalOut led1(LED1),	// Kill status
-           led2(LED2),	// debug
-           led3(LED3),	// debug
-           led4(LED4);	// debug
+DigitalOut led1(LED1), // Kill status. On means alive.
+           led2(LED2), // IMU: toggled when a character is received.
+           led3(LED3), // IMU: toggled when a buffer is parsed.
+           led4(LED4); // IMU: toggled when a character is copied from buffer to linebuf.
 
 bool debug = false;
-
