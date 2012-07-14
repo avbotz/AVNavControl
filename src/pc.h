@@ -53,6 +53,6 @@ private:
 extern bool debug;
 extern PC pc;
 
-extern bool isAlive;
+extern volatile bool isAlive;
 
 #endif
