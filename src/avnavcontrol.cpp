@@ -57,7 +57,7 @@ int main() {
 			char in;
 			while (true) {
 				// Get the character from the PC.
-				in = pc.readPC()
+				in = pc.readPC();
 				switch (in) {
 					case 'c':
 					{ // Braces here so that variables initialized in this case aren't visible from other cases.

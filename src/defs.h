@@ -45,7 +45,6 @@
 
 
 //pid.h
-#define NULL 0
 
 //PID tuning constants change to tune
 //the first list is the most used ones
