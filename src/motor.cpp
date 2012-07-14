@@ -10,6 +10,7 @@
 Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 	this->num_motors = num_motors;
 	p_device = new Serial(tx, rx); // (tx, rx) opens up new serial device (p_device is Serial* pointer)
+	// Settings for Mini Maestro serial -- see Mini Maestro data sheet
 	p_device->format(8, Serial::None, 1);
 	p_device->baud(baud); // Set the baud.
 
@@ -38,7 +39,6 @@ void Motor::putc(char c) {
 }
 
 void motor_send_wrapper() {
-	//if (!kill.getValueThresh()) return;
 	motor.send();
 }
 
