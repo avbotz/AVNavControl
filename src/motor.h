@@ -8,11 +8,11 @@
 #define SYNC_BYTE 255
 #define MOTOR_TX_BUF_SIZE 1024
 
-#define LEFT 0
-#define RIGHT 1
-#define FRONT 2
-#define BACK 3
-#define DROPPER 4
+#define LEFT 		0
+#define RIGHT 		1
+#define FRONT 		2
+#define BACK 		3
+#define DROPPER 	4
 
 void tx_interrupt_motor();
 void motor_send_wrapper();

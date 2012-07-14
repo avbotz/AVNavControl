@@ -44,3 +44,8 @@ DigitalOut led1(LED1),	// Kill status
 
 bool debug = false;
 
+//dropPositions[0] = value mbed should send the Pololu when nothing is to be dropped.
+//dropPositions[1] = value mbed should send the Pololu when one markers is to be dropped.
+//dropPositions[2] = extrapolate
+int dropPositions[3] = {0, 127, 254};
+

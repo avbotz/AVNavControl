@@ -160,33 +160,22 @@ char PC::readPC()
 			rx_overflow) { 
 		rx_overflow = false;
 		avnav temp;
-		switch (rx_buffer[i_rx_read]) {
-			//read 2 bytes, process them, and set the right variables
-			//the last increment skips the newline
-		case 'h':
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte1 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte2 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			desired_heading = decode_avnav(temp);
-			break;
-		case 'd':
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte1 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte2 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			desired_depth = decode_avnav(temp);
-			break;
-		case 'p':
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte1 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte2 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			desired_power = decode_avnav(temp);
-			break;
+
+		//read 2 bytes, process them, and set the right variables
+		//the last increment skips the newline
+
+		char command = rx_buffer[i_rx_read];
+		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+		temp.byte1 = rx_buffer[i_rx_read];
+		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+		temp.byte2 = rx_buffer[i_rx_read];
+		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+
+		switch (command) {
+			case 'h': desired_heading = decode_avnav(temp); break;
+			case 'd': desired_depth = decode_avnav(temp); break;
+			case 'p': desired_power = decode_avnav(temp); break;
+			case 'r': desired_drop = decode_avnav(temp); break;
 		}
 
 		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;

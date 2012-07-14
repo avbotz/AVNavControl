@@ -1,6 +1,6 @@
 #include "avnavcontrol.h"
 
-int desHead(0), desDepth(2), desPower(100);
+int desHead(0), desDepth(2), desPower(100), desDrop(0);
 float acc_x(0), acc_y(0), acc_z(0);
 volatile int depth(0);
 
@@ -57,10 +57,12 @@ int main() {
 			desHead = pc.desired_heading;
 			desPower = pc.desired_power;
 			desDepth = pc.desired_depth;
+			desDrop = pc.desired_drop;
 			give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
 			for (int i = 0; i < 4; i++) {
 				motor.set(i, motorArray[i]);
 			}
+			motor.set(DROPPER, dropPositions[desDrop]);
 		}		
 		else {
 			char in;
