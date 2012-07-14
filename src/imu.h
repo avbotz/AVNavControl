@@ -6,8 +6,7 @@
 
 #include "debug.h"
 #include "pc.h"
-
-#define IMU_RX_BUFFER_SIZE 1024
+#include "defs.h"
 
 void rx_interrupt_imu();
 
