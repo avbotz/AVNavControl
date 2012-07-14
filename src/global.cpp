@@ -23,7 +23,8 @@ AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
  */
 AnalogPressureSensor pressure(p17, 341.74, -48.107);
 
-// UART mapping http://mbed.org/users/mbed714/notebook/uart-mapping/
+// Page that maps pins to UART numbers.
+// http://mbed.org/users/mbed714/notebook/uart-mapping/
 
 //avnavcontrol.h
 // USB = UART 0
@@ -43,4 +44,3 @@ DigitalOut led1(LED1),	// Kill status
            led4(LED4);	// debug
 
 bool debug = false;
-

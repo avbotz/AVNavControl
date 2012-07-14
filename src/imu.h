@@ -29,7 +29,6 @@ public:
 	// ticks per degree, from <http://www.sparkfun.com/datasheets/Sensors/Gyro/PS-ITG-3200-00-01.4.pdf>
 	static const float gyroScale = 0.069565f;
 	static const float radToDeg = 57.29577951308232f; // equals 180/pi
-
 	
 	short accX, accY, accZ, 
 		  gyrX, gyrY, gyrZ, 
