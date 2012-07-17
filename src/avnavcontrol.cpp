@@ -89,6 +89,7 @@ int main() {
 						);
 						// Safely send the string to the PC.
 						pc.send_message(calibration_message);
+						tx_interrupt_pc();
 						// Tell the IMU to stop sending calibration.
 						imu.setCalibrationEnabled(false);
 						// Free the memory used by the string.
@@ -119,9 +120,15 @@ int main() {
 						}
 						break;
 					}
-					
+						
+					case '\0':
+						break;
+						
 					default:	// The user typed a key we didn't understand.
 						pc.send_message("Unrecognized command.\n\r");
+						if (pc.tx_empty) {
+							tx_interrupt_pc();
+						}
 						break;
 				}
 			}
