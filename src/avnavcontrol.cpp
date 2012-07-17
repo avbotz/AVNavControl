@@ -8,20 +8,18 @@ unsigned char motorArray[4];
 
 
 int main() {
-
 	init_pid();
-
+	
 	//attach the pc interrupts
 	pc.p_device->attach(&rx_interrupt_pc, Serial::RxIrq);
 	pc.p_device->attach(&tx_interrupt_pc, Serial::TxIrq);
-
+	
 	//attach motor interrupt
 	motor.p_device->attach(&tx_interrupt_motor, Serial::TxIrq);
-
+	
 	//attach imu interrupt
 	imu.p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
-
-
+	
 	//create the tickers here
 	Ticker tick[3];
 	if (!debug) {
@@ -29,15 +27,6 @@ int main() {
 	}
 	tick[1].attach(&do_pid, DT);
 	tick[2].attach(&motor_send_wrapper, DT/2);
-
-	// poll devices
-	// imu
-	// kill & pressure
-	// kalman
-	// pid
-
-	// every 1s: send data to pc
-	// upon serial from pc: set desired heading and desired depth
 	
 	while (true) {
 		if (motor.buffer_empty) {
@@ -52,6 +41,7 @@ int main() {
 		
 		imu.getData();
 		
+		// If we are running in normal (AKA production or competition) mode.
 		if (!debug) {
 			pc.readPC();
 			desHead = pc.desired_heading;
@@ -61,10 +51,13 @@ int main() {
 			for (int i = 0; i < 4; i++) {
 				motor.set(i, motorArray[i]);
 			}
-		}		
+		}
+		// Otherwise, we are running in debug mode.
 		else {
 			char in;
-			while ((in = pc.readPC())) {
+			while (true) {
+				// Get the character from the PC.
+				in = pc.readPC();
 				switch (in) {
 					case 'c':
 					{ // Braces here so that variables initialized in this case aren't visible from other cases.
@@ -103,23 +96,32 @@ int main() {
 						delete time;
 						break;
 					}
+					
 					case 'i':	// Act as a passthrough between IMU and PC
 						imu.directAccess();
 						break;
-					case 'k':
+						
+					case 'k':	// Print kill switch data.
 					{
+						// Buffer to hold the message.
 						char killinfo[20];
+						// Loop until reset
 						while (true) {
+							// Fill the buffer with the message
 							sprintf(killinfo, "kill: %f\n\r", kill.getValueRaw());
+							// Safely send the buffer to the PC.
 							pc.send_message(killinfo);
+							// Make it flush the PC buffer.
 							tx_interrupt_pc();
+							// Wait 1s between each message.
 							wait_ms(1000);
 						}
 						break;
 					}
-					default:
+					
+					default:	// The user typed a key we didn't understand.
 						pc.send_message("Unrecognized command.\n\r");
-					break;
+						break;
 				}
 			}
 		}

@@ -16,8 +16,4 @@ bool PCreadable, PCsendable;
 
 extern bool debug;
 
-
-// Do not remove
-char filler[1024];
-
 #endif

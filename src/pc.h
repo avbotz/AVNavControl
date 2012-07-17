@@ -5,8 +5,7 @@
 
 #include "analog.h"
 #include "pid.h"
-
-#define PC_BUFFER_SIZE 1024
+#include "defs.h"
 
 struct avnav {
 	char byte1;

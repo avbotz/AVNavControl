@@ -9,28 +9,7 @@
 #include "pid_library.h"
 #include "Kalman.h"
 #include "motor.h"
-
-#ifndef NULL
-#define NULL 0
-#endif
-
-//PID tuning constants change to tune
-//the first list is the most used ones
-//change them to tune, the second list
-//are the ones used by the mbed, they
-//are different and not intuitive
-
-#define PITCH_KP 0.01f
-#define PITCH_KI 0.0f
-#define PITCH_KD 0.0f
-
-#define HEADING_KP 1.0f
-#define HEADING_KI 0.2f
-#define HEADING_KD 0.0f
-
-#define DEPTH_KP 0.8f
-#define DEPTH_KI 0.05f
-#define DEPTH_KD 0.0f
+#include "defs.h"
 
 extern Kalman pitchK, rollK;
 

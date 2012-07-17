@@ -2,10 +2,12 @@
 #include "imu.h"
 
 IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
+	// Save a pointer to the PC for debugging use.
 	p_pc = pc->p_device;
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
-	p_device->format(8, Serial::None, 1);   // serial settings for the IMU--refer to IMU's data sheet
+	// serial settings for the IMU--refer to IMU's data sheet
+	p_device->format(8, Serial::None, 1);
 	
 	// Calibration variables
 	calibrationEnabled = false;
@@ -27,7 +29,10 @@ IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
 	
 	// Attach it as an RX interrupt only.
 	
-	p_device->putc('4');	// tell the imu to start sending in case it isn't doing that already.
+	// Tell the imu to start sending in case it isn't doing that already. (The
+	// IMU sends data upon receiving the character '4'. Note that this is not
+	// the numerical value 4.
+	p_device->putc('4');
 }
 
 IMU::~IMU() {
@@ -46,8 +51,13 @@ void IMU::parse() {
 	linebuf[i_linebuf] = '\0';
 	//print_serial(p_pc, buf);
 	short temp[9];
+	// Check data integrity of sscanf()'s results. sscanf() returns the number
+	// of values that it was able to extract. In this case, there are 9 values
+	// we are reading.
 	// we <3 pointer arithmetic
-	if (sscanf(linebuf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8) == 9){
+	if (sscanf(linebuf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", 
+		temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8) == 9)
+	{
 		accX = temp[0];
 		accY = temp[1];
 		accZ = temp[2];
@@ -58,12 +68,9 @@ void IMU::parse() {
 		magY = temp[7];
 		magZ = temp[8];
 		
+		// Indicate that we read data successfully.
 		led3 = !led3;
 	}
-
-	//char printtemp[75];
-	//sprintf(printtemp, "%d, %d, %d, %d, %d, %d, %d, %d, %d\n\r", accX, accY, accZ, gyrX, gyrY, gyrZ, magX, magY, magZ);
-	//print_serial(p_pc, printtemp);
 }
 
 
@@ -72,9 +79,6 @@ bool IMU::readable() {
 }
 
 void IMU::getData() {
-	//print_serial(p_pc, "hello");
-	//p_pc->printf("hi");
-	
 	// While there is data to be read, or the buffer has overflowed.
 	while (i_buffer_read != i_buffer_write || buffer_overflow) {
 		linebuf[i_linebuf] = buffer[i_buffer_read];
@@ -120,7 +124,6 @@ void IMU::getData() {
 		}
 		i_linebuf = 0;
 		
-		//p_pc->printf("cleared\n\r");
 		parseNow = false;
 	}
 }
@@ -147,7 +150,8 @@ void IMU::directAccess() {
 
 void IMU::setCalibrationEnabled(bool isEnabled) {
 	calibrationEnabled = isEnabled;
-	// If we're turning calibration on, clear the variables.
+	// If we're turning calibration on, clear the variables that stored the old
+	// calibration data.
 	if (isEnabled) {
 		sumAccX = sumAccY = sumAccZ = sumGyrX = sumGyrY = sumGyrZ = sumMagX = sumMagY = sumMagZ = num = 0;
 		minGyrX = minGyrY = minGyrZ = INT_MAX;
@@ -157,6 +161,7 @@ void IMU::setCalibrationEnabled(bool isEnabled) {
 
 void rx_interrupt_imu()
 {
+	// Indicate that the interrupt was called.
 	led2 = !led2;
 	
 	while (imu.p_device->readable()) {

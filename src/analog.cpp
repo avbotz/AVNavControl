@@ -10,9 +10,8 @@ AnalogInput::~AnalogInput() {
 	}
 }
 
-/*
- * Returns the raw value of the device. Probably noisy.
- */
+// Returns the raw value of the device. This is a noisy value and probably
+// shouldn't be used unless you actually want the noisy value.
 float AnalogInput::getValueRaw() {
 	return p_analog->read();
 }
@@ -40,12 +39,15 @@ int AnalogPressureSensor::getValueCalibrated() {
 	return (int)(getValueRaw() * m + b + 0.5f);
 }
 
+// The AnalogKillSwitch class basically sets up two pins on the mbed to act like
+// an ohmmeter.
 AnalogKillSwitch::AnalogKillSwitch(PinName Vin, PinName Vout, float thresh) :
 AnalogInput(Vin) {
 	threshold = thresh;
 	value = thresh;
 	p_Vout = new AnalogOut(Vout);
-	p_Vout->write(1.0f); // 1.0 * 3.3 volts
+	// Put 1.0f * 3.3 volts on the kill voltage out (Vout) pin.
+	p_Vout->write(1.0f);
 }
 
 AnalogKillSwitch::~AnalogKillSwitch() {
