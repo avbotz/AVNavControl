@@ -76,3 +76,7 @@ float AnalogKillSwitch::getValueRaw() {
 bool AnalogKillSwitch::getValueThresh() {
 	return (getValueRaw() > threshold);
 }
+
+void updateKill() {
+	isAlive = kill.getValueThresh();
+}

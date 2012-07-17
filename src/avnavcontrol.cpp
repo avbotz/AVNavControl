@@ -21,12 +21,13 @@ int main() {
 	imu.p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
 	
 	//create the tickers here
-	Ticker tick[3];
+	Ticker tick[4];
 	if (!debug) {
 		tick[0].attach(&send_status_pc, 1.0);
 	}
 	tick[1].attach(&do_pid, DT);
 	tick[2].attach(&motor_send_wrapper, DT/2);
+	tick[3].attach(&updateKill, .01);
 	
 	while (true) {
 		if (motor.buffer_empty) {
@@ -36,8 +37,8 @@ int main() {
 			tx_interrupt_pc();
 		}
 		
-		// Set isAlive and led1 to the current kill state.
-		led1 = isAlive = kill.getValueThresh();
+		// Set led1 to the current kill state.
+		led1 = isAlive;
 		
 		imu.getData();
 		

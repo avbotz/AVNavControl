@@ -49,8 +49,12 @@ private:
 	float value, threshold;
 };
 
+
+void updateKill();
+
 //The two analog devices are the killswitch and pressure sensor.
 extern AnalogKillSwitch kill;
 extern AnalogPressureSensor pressure;
+extern volatile bool isAlive;
 
 #endif
