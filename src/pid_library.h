@@ -20,12 +20,12 @@ public:
 	void reset();
 	void scale_input();
 	
+	//the gains for PID
+	float _kp, _ki, _kd;
+	
 private:
 	float calculate_i();
 	float calculate_d();
-
-	//the gains for PID
-	float _kp, _ki, _kd;
 
 	//the max and min outside which the integral term will not be adjusted
 	//this is to avoid integral windup where the integral term increases

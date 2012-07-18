@@ -120,13 +120,141 @@ int main() {
 						}
 						break;
 					}
+					
+					case 'p':	// PID tuning
+					{
+						pc.send_message("Entered PID tuning.\r\n");
+						pc.send_message("g: set gains\r\n");
+						pc.send_message("s: set setpoint\r\n");
+						pc.send_message("p: print gains.\r\n");
+						tx_interrupt_pc();
+						
+						while (true) {
+							if (motor.buffer_empty) {
+								tx_interrupt_motor();
+							}
+							if (pc.tx_empty) {
+								tx_interrupt_pc();
+							}
+							
+							give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
+							for (int i = 0; i < 4; i++) {
+								motor.set(i, motorArray[i]);
+							}
+							
+							char mes = pc.readPC();
+							char mes2;
+							switch (mes) {
+								case 'g':	// Set gains
+									pc.send_message("Setting gains. Which one? ");
+									tx_interrupt_pc();
+									
+									// Block while waiting for next character
+									while (!(mes2 = pc.readPC()));
+									
+									if (mes2 == 'p' || mes2 == 'd' || mes2 == 'h')
+									{
+										// Stop the motors
+										motor.set(127);
+										tx_interrupt_motor();
+										//4 integers for each p i and d. divides what you give by 1000. leading zeroes if necessary
+										float gains[3] = {0, 0, 0};
+										for (int g = 0; g < 3; g++)
+										{
+											for (int i = 0; i < 4; i++)
+											{
+												char j;
+												while (!(j = pc.readPC()));
+												gains[g] = gains[g] * 10 + (j - '0');
+											}
+											gains[g] /= 1000;
+										}
+										
+										PID* activePID;
+										switch (mes2)
+										{
+											case 'p':
+												activePID = pitchPID; break;
+											case 'd':
+												activePID = depthPID; break;
+											case 'h':
+												activePID = headingPID; break;
+										}
+										activePID->setGains(gains[0], gains[1], gains[2]);
+										activePID->reset();
+										pc.send_message("gains set\r\n");
+									}
+									else
+									{
+										pc.send_message("no gains for that letter\n\r");
+									}
+									break;
+								case 's':	//set setpoint
+									pc.send_message("Setting setpoint. Which one? ");
+									tx_interrupt_pc();
+									
+									while (!(mes2 = pc.readPC()));	//block waiting for next character
+									
+									if (mes2 == 'p' || mes2 == 'd' || mes2 == 'h')
+									{
+										//3 integers for set point use leading zeroes if necessary
+										motor.set(127);
+										tx_interrupt_motor();	//kill motors
+										float point = 0;
+										for (int i = 0; i < 3; i++)
+										{
+											char j;
+											while (!(j = pc.readPC()));
+											point = 10 * point + (j - '0');
+										}
+										
+										PID* activePID;
+										switch (mes2)
+										{
+											case 'p':
+												activePID = pitchPID;   break;
+											case 'd':
+												activePID = depthPID;   break;
+											case 'h':
+												activePID = headingPID; break;
+										}
+										activePID->setSetpoint(point);
+										activePID->reset();
+										
+										pc.send_message("setpoint set\r\n");
+									}
+									else
+									{
+										pc.send_message("no setpoint for that letter\r\n");
+									}
+									break;
+								case 'p':
+									char output[100];
+									
+									sprintf(output, "Pitch gains: %f, %f, %f\r\nDepth gains: %f, %f, %f\r\nHeading gains: %f, %f, %f\r\n", 
+											pitchPID->_kp, pitchPID->_ki, pitchPID->_kd,
+											depthPID->_kp, depthPID->_ki, depthPID->_kd,
+											headingPID->_kp, headingPID->_ki, headingPID->_kd);
+									pc.send_message(output);
+									break;
+									
+								case '\0':
+									break;
+									
+								default:
+									pc.send_message("what the hell were you thinking?\r\n");
+							}
+							tx_interrupt_pc();
+						}
+					}
 						
 					case '\0':
 						break;
 						
 					default:	// The user typed a key we didn't understand.
 						pc.send_message("Unrecognized command.\n\r");
-						if (pc.tx_empty) {
+						if (pc.tx_empty)
+						{
 							tx_interrupt_pc();
 						}
 						break;
