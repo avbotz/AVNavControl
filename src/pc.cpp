@@ -165,20 +165,20 @@ char PC::readPC()
 		//the last increment skips the newline
 
 		char command = rx_buffer[i_rx_read];
-		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+		i_rx_read = (i_rx_read + 1) % PC_BUFFER_SIZE;
 		temp.byte1 = rx_buffer[i_rx_read];
-		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+		i_rx_read = (i_rx_read + 1) % PC_BUFFER_SIZE;
 		temp.byte2 = rx_buffer[i_rx_read];
-		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+		i_rx_read = (i_rx_read + 1) % PC_BUFFER_SIZE;
 
 		switch (command) {
 			case 'h': desired_heading = decode_avnav(temp); break;
-			case 'd': desired_depth = decode_avnav(temp); break;
-			case 'p': desired_power = decode_avnav(temp); break;
-			case 'r': desired_drop = decode_avnav(temp); break;
+			case 'd': desired_depth   = decode_avnav(temp); break;
+			case 'p': desired_power   = decode_avnav(temp); break;
+			case 'r': desired_drop    = decode_avnav(temp); break;
 		}
 
-		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+		i_rx_read = (i_rx_read + 1) % PC_BUFFER_SIZE;
 	}
 	return 1;
 }
