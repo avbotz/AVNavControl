@@ -31,6 +31,9 @@ private:
 	float m, b;
 };
 
+extern volatile int depth;
+void updatePressure();
+
 /*
  * The kill switch is either killed or unkilled, determined by whether
  * the voltage is greater than some specified threshold.

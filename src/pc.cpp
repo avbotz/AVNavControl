@@ -65,7 +65,6 @@ extern float ppower;
 
 void send_status_pc()
 {
-	depth = pressure.getValueCalibrated();
 	avnav avnav_temp;
 
 	// Construct the message to the BeagleBoard based on state of the sub.

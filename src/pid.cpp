@@ -21,7 +21,7 @@ PID* pitchPID = NULL;
 PID* headingPID = NULL;
 PID* depthPID = NULL;
 
-extern Serial pc;
+extern PC pc;
 
 void reset_pid() {
 	pitchPID->reset();

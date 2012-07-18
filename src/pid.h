@@ -10,6 +10,7 @@
 #include "Kalman.h"
 #include "motor.h"
 #include "defs.h"
+#include "pc.h"
 
 extern Kalman pitchK, rollK;
 

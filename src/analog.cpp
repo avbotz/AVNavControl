@@ -39,6 +39,10 @@ int AnalogPressureSensor::getValueCalibrated() {
 	return (int)(getValueRaw() * m + b + 0.5f);
 }
 
+void updatePressure() {
+	depth = pressure.getValueCalibrated();
+}
+
 // The AnalogKillSwitch class basically sets up two pins on the mbed to act like
 // an ohmmeter.
 AnalogKillSwitch::AnalogKillSwitch(PinName Vin, PinName Vout, float thresh) :

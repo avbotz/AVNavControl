@@ -2,7 +2,6 @@
 
 int desHead(0), desDepth(2), desPower(100);
 float acc_x(0), acc_y(0), acc_z(0);
-volatile int depth(0);
 
 unsigned char motorArray[4];
 
@@ -21,13 +20,14 @@ int main() {
 	imu.p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
 	
 	//create the tickers here
-	Ticker tick[4];
+	Ticker tick[5];
 	if (!debug) {
 		tick[0].attach(&send_status_pc, 1.0);
 	}
 	tick[1].attach(&do_pid, DT);
 	tick[2].attach(&motor_send_wrapper, DT/2);
 	tick[3].attach(&updateKill, .01);
+	tick[4].attach(&updatePressure, 0.1);
 	
 	while (true) {
 		if (motor.buffer_empty) {
