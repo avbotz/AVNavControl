@@ -136,12 +136,14 @@ int main() {
 					case 'p':	// PID tuning
 					{
 						desHead = 0;
-						desPower = 120;
-						desDepth = 5;
+						desPower = 100;
+						desDepth = 25;
+						
 						pc.send_message("Entered PID tuning.\r\n");
 						pc.send_message("g: set gains\r\n");
 						pc.send_message("s: set setpoint\r\n");
 						pc.send_message("p: print gains.\r\n");
+						pc.send_message("d: view status\r\n");
 						tx_interrupt_pc();
 						
 						while (true) {
@@ -180,6 +182,10 @@ int main() {
 											{
 												char j;
 												while (!(j = pc.readPC()));
+												if (j < '0' || j > '9') {
+													i--;
+													continue;
+												}
 												gains[g] = gains[g] * 10 + (j - '0');
 											}
 											gains[g] /= 1000;
@@ -220,6 +226,10 @@ int main() {
 										{
 											char j;
 											while (!(j = pc.readPC()));
+											if (j < '0' || j > '9') {
+												i--;
+												continue;
+											}
 											point = 10 * point + (j - '0');
 										}
 										
@@ -252,11 +262,17 @@ int main() {
 											headingPID->_kp, headingPID->_ki, headingPID->_kd);
 									pc.send_message(output);
 									break;
-									
+								case 'q':
+									char out[50];
+									sprintf(out, "Heading setpoint: %d\r\nDepth setpoint: %d\r\n", desHead, desDepth);
+									pc.send_message(out);
+									break;
 								case 'd':
-									char buff[12];
-									sprintf(buff, "%f\r\n", calcH);
+									char buff[25];
+									sprintf(buff, "Heading: %f\tDepth: %d\tKill: %d\r\n", calcH, depth, isAlive);
 									pc.send_message(buff);
+									break;
+									
 								case '\0':
 									break;
 									
