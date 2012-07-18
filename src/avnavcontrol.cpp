@@ -135,6 +135,9 @@ int main() {
 					
 					case 'p':	// PID tuning
 					{
+						desHead = 0;
+						desPower = 120;
+						desDepth = 5;
 						pc.send_message("Entered PID tuning.\r\n");
 						pc.send_message("g: set gains\r\n");
 						pc.send_message("s: set setpoint\r\n");
@@ -148,7 +151,7 @@ int main() {
 							if (pc.tx_empty) {
 								tx_interrupt_pc();
 							}
-							
+							imu.getData();
 							give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
 							for (int i = 0; i < 4; i++) {
 								motor.set(i, motorArray[i]);
@@ -226,9 +229,9 @@ int main() {
 											case 'p':
 												activePID = pitchPID;   break;
 											case 'd':
-												activePID = depthPID;   break;
+												activePID = depthPID; desDepth = point; break;
 											case 'h':
-												activePID = headingPID; break;
+												activePID = headingPID; desHead = point; break;
 										}
 										activePID->setSetpoint(point);
 										activePID->reset();
@@ -250,6 +253,10 @@ int main() {
 									pc.send_message(output);
 									break;
 									
+								case 'd':
+									char buff[12];
+									sprintf(buff, "%f\r\n", calcH);
+									pc.send_message(buff);
 								case '\0':
 									break;
 									
