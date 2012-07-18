@@ -62,7 +62,7 @@ int main() {
 				switch (in) {
 					case 'c':
 					{ // Braces here so that variables initialized in this case aren't visible from other cases.
-						pc.send_message("Begin IMU calibration.\n");
+						pc.send_message("Begin IMU calibration.\r\n");
 						tx_interrupt_pc();
 						// Tell the IMU to start saving calibration information.
 						imu.setCalibrationEnabled(true);
@@ -71,9 +71,21 @@ int main() {
 						*imuCalibrationWait = 1000 * 10;
 						Timer* time = new Timer();
 						time->start();
-						while (time->read_ms() < *imuCalibrationWait) {
-							if (!(time->read_ms() % 10)) {
+						char calibProgressMsg[30];
+						int lastNum = 0;
+						while (time->read_ms() < *imuCalibrationWait)
+						{
+							int timeElapsed = time->read_ms();
+							if (!(timeElapsed % 10))
+							{
 								imu.getData();
+							}
+							if (imu.num != lastNum && imu.num % 100 == 0)
+							{
+								sprintf(calibProgressMsg, "Calibrating: %d readings in %d ms\r\n", imu.num, timeElapsed);
+								pc.send_message(calibProgressMsg);
+								tx_interrupt_pc();
+								lastNum = imu.num;
 							}
 						}
 						// String to store the information message for PC.
@@ -81,7 +93,7 @@ int main() {
 						// Print a formatted message to the string.
 						sprintf(
 						 calibration_message,
-						 "IMU averages for last %d ms and %d readings: %f, %f, %f, %f, %f, %f, %f, %f, %f\n",
+						 "IMU averages for last %d ms and %d readings: %f, %f, %f, %f, %f, %f, %f, %f, %f\r\n",
 						 *imuCalibrationWait, imu.num,
 						 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
 						 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
