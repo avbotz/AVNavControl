@@ -71,20 +71,29 @@ int main() {
 						*imuCalibrationWait = 1000 * 10;
 						Timer* time = new Timer();
 						time->start();
+						// Buffer for printing the IMU's calibration progress.
 						char calibProgressMsg[30];
+						// Previous time that the calibration message was printed.
+						// Initialize to 0 so we don't print a message for time = 0.
 						int lastTime = 0;
+						// Loop until the calibration time is exceeded.
 						while (time->read_ms() < *imuCalibrationWait)
 						{
+							// Get the elapsed time from timer.
 							int timeElapsed = time->read_ms();
+							// Get data every 10 ms.
 							if (!(timeElapsed % 10))
 							{
 								imu.getData();
 							}
+							// If the time is a multiple of 1000 ms and we haven't already printed at this time.
 							if (timeElapsed % 1000 == 0 && timeElapsed != lastTime)
 							{
+								// Print the calibration progress.
 								sprintf(calibProgressMsg, "Calibrating: %d readings in %d ms\r\n", imu.num, timeElapsed);
 								pc.send_message(calibProgressMsg);
 								tx_interrupt_pc();
+								// Save the elapsed time this message was printed at.
 								lastTime = timeElapsed;
 							}
 						}
