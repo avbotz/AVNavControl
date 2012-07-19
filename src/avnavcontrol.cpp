@@ -102,7 +102,7 @@ int main() {
 						// Print a formatted message to the string.
 						sprintf(
 						 calibration_message,
-						 "IMU averages for last %d ms and %d readings: %f, %f, %f, %f, %f, %f, %f, %f, %f\r\n",
+						 "IMU averages for last %d ms and %d readings:\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n",
 						 *imuCalibrationWait, imu.num,
 						 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
 						 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
