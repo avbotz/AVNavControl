@@ -72,7 +72,7 @@ int main() {
 						Timer* time = new Timer();
 						time->start();
 						char calibProgressMsg[30];
-						int lastNum = 0;
+						int lastTime = 0;
 						while (time->read_ms() < *imuCalibrationWait)
 						{
 							int timeElapsed = time->read_ms();
@@ -80,12 +80,12 @@ int main() {
 							{
 								imu.getData();
 							}
-							if (imu.num != lastNum && imu.num % 100 == 0)
+							if (timeElapsed % 1000 == 0 && timeElapsed != lastTime)
 							{
 								sprintf(calibProgressMsg, "Calibrating: %d readings in %d ms\r\n", imu.num, timeElapsed);
 								pc.send_message(calibProgressMsg);
 								tx_interrupt_pc();
-								lastNum = imu.num;
+								lastTime = timeElapsed;
 							}
 						}
 						// String to store the information message for PC.
