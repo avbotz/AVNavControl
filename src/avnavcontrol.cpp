@@ -1,6 +1,6 @@
 #include "avnavcontrol.h"
 
-int desHead(0), desDepth(2), desPower(100);
+volatile int desHead(0), desDepth(2), desPower(100);
 float acc_x(0), acc_y(0), acc_z(0);
 
 unsigned char motorArray[4];

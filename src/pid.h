@@ -14,7 +14,7 @@
 
 extern Kalman pitchK, rollK;
 
-extern float calcP, calcH, calcR;
+extern volatile float calcP, calcH, calcR;
 extern float accP, accR;
 extern float accX, accY, accZ, gyrX, gyrY, gyrZ;
 
@@ -22,7 +22,7 @@ extern PID* pitchPID;
 extern PID* headingPID;
 extern PID* depthPID;
 
-extern int desHead, desDepth, desPower;
+extern volatile int desHead, desDepth, desPower;
 extern volatile int depth;
 extern bool debug;
 

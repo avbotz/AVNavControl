@@ -3,7 +3,7 @@
 Kalman pitchK(MU_X_GYR);
 Kalman rollK(MU_Y_GYR);
 
-float calcP, calcH, calcR;
+volatile float calcP, calcH, calcR;
 float accP, accR;
 
 float accX(0), accY(0), accZ(0), gyrX(0), gyrY(0), gyrZ(0);
