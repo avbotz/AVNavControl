@@ -22,7 +22,7 @@ int main() {
 	//create the tickers here
 	Ticker tick[5];
 	if (!debug) {
-		tick[0].attach(&send_status_pc, 1.0);
+		tick[0].attach(&send_status_pc, 0.1);
 	}
 	tick[1].attach(&do_pid, DT);
 	tick[2].attach(&motor_send_wrapper, DT/2);
