@@ -278,7 +278,7 @@ int main() {
 									break;
 								case 'd':
 									char buff[25];
-									sprintf(buff, "Heading: %f\tDepth: %d\tKill: %d\r\n", calcH, depth, isAlive);
+									sprintf(buff, "Heading: %f\tDepth: %d\tPitch: %f\tKill: %d\r\n", calcH, depth, calcP, isAlive);
 									pc.send_message(buff);
 									break;
 									
