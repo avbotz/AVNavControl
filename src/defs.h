@@ -53,7 +53,7 @@
 //are the ones used by the mbed, they
 //are different and not intuitive
 
-#define PITCH_KP 0.01f
+#define PITCH_KP 0.001f
 #define PITCH_KI 0.0f
 #define PITCH_KD 0.0f
 

@@ -138,7 +138,7 @@ void do_pid() {
 		isMove = true;
 	}
 	//attempt to correct heading while moving if between 5 and 15 degrees off
-	else if (fabs(dHC-calcH) < 15) {
+	else if (fabs(dHC-calcH) < 10) {
 		isTurn = true;
 		isMove = true;
 	}
@@ -201,7 +201,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 		motorSpeed[BACK] = -1.0f * dpid;
 	}
 	int powerNum[4];
-	motorSpeed[RIGHT] *= .85; //because the right motor is stronger
+	motorSpeed[RIGHT] *= 0.9; //because the right motor is stronger
 	motorSpeed[BACK] *= -1;  //because the back motor is backwards
 	
 	//motorSpeed is a number around zero so the following scales them 0 - 254 which the motors require
