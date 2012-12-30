@@ -35,7 +35,7 @@ void PID::setSetpoint(float setpoint)
 
 void PID::setProcessValue(float processValue)
 {
-	_last = _processValue;
+	_last = _scaledInput;
 	_processValue = processValue;
 }
 
