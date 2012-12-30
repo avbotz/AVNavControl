@@ -63,16 +63,23 @@ float PID::calculate_d()
 	return (_scaledInput - _last) / _dt;
 }
 
+float PID::update(float processValue, float setpoint)
+{
+	setSetpoint(setpoint);
+	setProcessValue(processValue);
+	calculate();
+}
+
 void PID::scale_input()
 {
-	if (_processValue + _bias > _inputMax) {
+	if (_processValue + _bias - _setpoint > _inputMax) {
 		_scaledInput = (_inputMax) * _inputScale;
 	}
 
-	else if (_processValue + _bias < _inputMin) {
+	else if (_processValue + _bias - _setpoint < _inputMin) {
 		_scaledInput = (_inputMin) * _inputScale;
 	}
 	else {
-		_scaledInput = (_processValue + _bias) * _inputScale;
+		_scaledInput = (_processValue + _bias - _setpoint) * _inputScale;
 	}
 }

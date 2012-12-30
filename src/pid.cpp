@@ -72,8 +72,6 @@ void init_pid() {
 void do_pid() {
 	//if(debug || isAlive) return;
 	//dammit adit
-	headingPID->setSetpoint(desHead);
-	depthPID->setSetpoint(desDepth);
 	float ppid, hpid, dpid;
 	
 	//check kill state, maybe reset
@@ -153,13 +151,9 @@ void do_pid() {
 	float headError = dHC - calcH;
 	float depthError = desDepth - depth;
 	
-	headingPID->setProcessValue(headError);
-	depthPID->setProcessValue(depthError);
-	pitchPID->setProcessValue(calcP);
-	
-	hpid = headingPID->calculate();
-	dpid = depthPID->calculate();
-	ppid = pitchPID->calculate();
+	hpid = headingPID->update(calcH, dHC);
+	dpid = depthPID->update(depth, desDepth);
+	ppid = pitchPID->update(calcP, 0.0f);
 	
 	update_motors(hpid, dpid, ppid);
 }

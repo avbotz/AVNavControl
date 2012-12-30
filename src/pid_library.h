@@ -17,6 +17,7 @@ public:
 	void setSetpoint(float setpoint);
 	void setProcessValue(float processValue);
 	float calculate();
+	float update(float processValue, float setpoint);
 	void reset();
 	void scale_input();
 	
