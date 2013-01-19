@@ -54,6 +54,10 @@ void PID::reset()
 
 float PID::calculate_i()
 {
+	if ((_last - _setpoint) * (_processValue - _setpoint) < 0)
+	{
+		return 0.0f;
+	}
 	_integral += _scaledInput * _dt;
 	return _integral;
 }
