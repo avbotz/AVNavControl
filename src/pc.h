@@ -33,8 +33,7 @@ public:
 	Serial* p_device;
 	Ticker* pc_ticker;
 
-	bool tx_empty;
-	bool rx_overflow;
+	bool isTxEmpty() const;
 
 private:
 	friend void rx_interrupt_pc();
@@ -43,9 +42,8 @@ private:
 	
 	char* mes;
 	int message_length;
-	char tx_buffer[PC_BUFFER_SIZE], rx_buffer[PC_BUFFER_SIZE];
-	int i_tx_read, i_tx_write;
-	int i_rx_read, i_rx_write;
+	
+	CircularBuffer* tx_buffer,* rx_buffer;
 
 };
 

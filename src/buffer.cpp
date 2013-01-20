@@ -7,7 +7,7 @@ CircularBuffer::CircularBuffer(int size)
 	if (buffer == NULL) {
 		//TODO: ERROR OUT OF MEMORY
 	}
-	this.size = size;
+	this->size = size;
 	i_read = i_write = 0;
 	empty = true;
 	overflow = false;
@@ -18,7 +18,7 @@ CircularBuffer::~CircularBuffer()
 	delete buffer;
 }
 
-char CircularBuffer::readNextByte()
+char CircularBuffer::readByte()
 {
 	char c = buffer[i_read];
 	i_read = (i_read + 1) % size;
@@ -28,9 +28,10 @@ char CircularBuffer::readNextByte()
 	//in reality not really, but lets pretend it does
 	//becase if you're a whole buffer behind you're FUBAR already
 	overflow = false;
+	return c;
 }
 
-void CircularBuffer::writeNextByte(char c)
+void CircularBuffer::writeByte(char c)
 {
 	buffer[i_write] = c;
 	i_write = (i_write + 1) % size;
@@ -41,11 +42,16 @@ void CircularBuffer::writeNextByte(char c)
 	empty = false;
 }
 
-bool CircularBuffer::hasData(int n)
+bool CircularBuffer::hasData(int n) const
 {
 	//if reading n bytes does not cause us to loop around to the front of the buffer
 	//just add n to figure out the last byte that will need to be read
 	//otherwise, we have to loop around to the front of the buffer to check the last
 	//byte that will be read
 	return ((i_read + n) < size)?((i_read + n) <= i_write):((i_read + n) % size <= i_write);
+}
+
+char CircularBuffer::peek(int n) const
+{
+	return buffer[(i_read + n) % size];
 }

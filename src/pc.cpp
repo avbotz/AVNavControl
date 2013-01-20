@@ -8,16 +8,9 @@ PC::PC(PinName tx, PinName rx, int baud)
 	desired_depth = 20;
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
-
-	for (int i = 0; i < PC_BUFFER_SIZE; i++) {
-		rx_buffer[i] = tx_buffer[i] = 0;
-	}
-
-	i_tx_read = i_tx_write = 0;
-	i_rx_read = i_rx_write = 0;
-
-	tx_empty = true;
-
+	
+	tx_buffer = new CircularBuffer(PC_BUFFER_SIZE);
+	rx_buffer = new CircularBuffer(PC_BUFFER_SIZE);
 
 /*
  * This is the buffer for the message that will be sent to the BeagleBoard.
@@ -108,22 +101,23 @@ void PC::send_message(const char* message)
 
 void PC::putc(char c)
 {
-	tx_buffer[i_tx_write] = c;
 	NVIC_DisableIRQ(UART1_IRQn);
-	i_tx_write = (i_tx_write + 1) % PC_BUFFER_SIZE;
+	tx_buffer->writeByte(c);
 	NVIC_EnableIRQ(UART1_IRQn);
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
 }
 
+bool PC::isTxEmpty() const
+{
+	return tx_buffer->empty;
+}
+
 void tx_interrupt_pc()
 {
-	while (pc.p_device->writeable() && pc.i_tx_write != pc.i_tx_read) {
-		pc.p_device->putc(pc.tx_buffer[pc.i_tx_read]);
-		pc.i_tx_read = (pc.i_tx_read + 1) % PC_BUFFER_SIZE;
-		pc.tx_empty = false;
+	while (pc.p_device->writeable() && !pc.tx_buffer->empty) {
+		pc.p_device->putc(pc.tx_buffer->readByte());
 	}
-	if (pc.i_tx_write == pc.i_tx_read) {
-		pc.tx_empty = true;
+	if (pc.tx_buffer->empty) {
 		NVIC_DisableIRQ(UART1_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
@@ -132,12 +126,10 @@ void tx_interrupt_pc()
 void rx_interrupt_pc()
 {
 	while (pc.p_device->readable()) {
-		pc.rx_buffer[pc.i_rx_write] = pc.p_device->getc();
 		NVIC_DisableIRQ(UART0_IRQn);
-		pc.i_rx_write = (pc.i_rx_write + 1) % PC_BUFFER_SIZE;
+		pc.rx_buffer->writeByte(pc.p_device->getc());
 		NVIC_EnableIRQ(UART0_IRQn);
-		if (pc.i_rx_write == pc.i_rx_read) {
-			pc.rx_overflow = true;
+		if (pc.rx_buffer->overflow) {
 			NVIC_DisableIRQ(UART0_IRQn);
 			break;
 		}
@@ -150,50 +142,36 @@ void rx_interrupt_pc()
 char PC::readPC()
 {
 	if (debug) {
-		if (i_rx_read == i_rx_write) return 0;
-		char ret = rx_buffer[i_rx_read];
-		i_rx_read = (i_rx_read + 1) % PC_BUFFER_SIZE;
-		return ret;
+		if (rx_buffer->empty) return 0;
+		else return rx_buffer->readByte();
 	}
 	
-	while ((i_rx_read != i_rx_write &&
-			((i_rx_read + 1) % PC_BUFFER_SIZE) != i_rx_write &&		//make sure there are 4 characters to be read
-			((i_rx_read + 2) % PC_BUFFER_SIZE) != i_rx_write &&
-			((i_rx_read + 3) % PC_BUFFER_SIZE) != i_rx_write &&
-			(rx_buffer[(i_rx_read + 3) % PC_BUFFER_SIZE] == '\n')) || //and the fourth character is a newline
-			rx_overflow) { 
-		rx_overflow = false;
+	while ((rx_buffer->hasData(4) &&		//make sure there are 4 characters to be read 
+			rx_buffer->peek(3) == '\n') ||	//and the fourth character is a newline
+			rx_buffer->overflow) {
+			
 		avnav temp;
-		switch (rx_buffer[i_rx_read]) {
+		switch (rx_buffer->readByte()) {
 			//read 2 bytes, process them, and set the right variables
 			//the last increment skips the newline
 		case 'h':
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte1 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte2 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte1 = rx_buffer->readByte();
+			temp.byte2 = rx_buffer->readByte();
 			desired_heading = decode_avnav(temp);
 			break;
 		case 'd':
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte1 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte2 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte1 = rx_buffer->readByte();
+			temp.byte2 = rx_buffer->readByte();
 			desired_depth = decode_avnav(temp);
 			break;
 		case 'p':
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte1 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
-			temp.byte2 = rx_buffer[i_rx_read];
-			i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+			temp.byte1 = rx_buffer->readByte();
+			temp.byte2 = rx_buffer->readByte();
 			desired_power = decode_avnav(temp);
 			break;
 		}
 
-		i_rx_read = (i_rx_read+1)%PC_BUFFER_SIZE;
+		rx_buffer->readByte();	//advance past the newline
 	}
 	return 1;
 }

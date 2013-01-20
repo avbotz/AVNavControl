@@ -8,17 +8,14 @@
 
 // MiniSSC2's Constructor
 Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
+
 	this->num_motors = num_motors;
 	p_device = new Serial(tx, rx); // (tx, rx) opens up new serial device (p_device is Serial* pointer)
 	// Settings for Mini Maestro serial -- see Mini Maestro data sheet
 	p_device->format(8, Serial::None, 1);
 	p_device->baud(baud); // Set the baud.
-
-	for (int i = 0; i < MOTOR_TX_BUF_SIZE; i++) {
-		buffer[i] = 0;
-	}
-	i_buffer_write = i_buffer_read = 0;
-	buffer_empty = true;
+	tx_buffer = new CircularBuffer(MOTOR_TX_BUF_SIZE);
+	
 	set(127);   // The motors should start stationary (zero power)
 }
 
@@ -28,12 +25,12 @@ Motor::~Motor() {
 		// must do this. otherwise, you'll have memory leakage & you may not be able to re-open the serial port later
 		delete p_device;
 	}
+	delete tx_buffer;
 }
 
 void Motor::putc(char c) {
-	buffer[i_buffer_write] = c;
 	NVIC_DisableIRQ(UART1_IRQn);
-	i_buffer_write = (i_buffer_write + 1) % MOTOR_TX_BUF_SIZE;
+	tx_buffer->writeByte(c);
 	NVIC_EnableIRQ(UART1_IRQn);
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
 }
@@ -66,18 +63,19 @@ void Motor::set(int i_motor, unsigned char value) {
 	motors[i_motor] = value;
 }
 
-char Motor::get(int i_motor) {
+char Motor::get(int i_motor) const {
 	return motors[i_motor];
 }
 
+bool Motor::isTxEmpty() const {
+	return motor.tx_buffer->empty;
+}
+
 void tx_interrupt_motor() {
-	while (motor.p_device->writeable() && motor.i_buffer_write != motor.i_buffer_read) {
-		motor.p_device->putc(motor.buffer[motor.i_buffer_read]);
-		motor.i_buffer_read = (motor.i_buffer_read + 1) % MOTOR_TX_BUF_SIZE;
-		motor.buffer_empty = false;
+	while (motor.p_device->writeable() && !motor.tx_buffer->empty) {
+		motor.p_device->putc(motor.tx_buffer->readByte());
 	}
-	if (motor.i_buffer_write == motor.i_buffer_read) {
-		motor.buffer_empty = true;
+	if (motor.tx_buffer->empty) {
 		NVIC_DisableIRQ(UART1_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}

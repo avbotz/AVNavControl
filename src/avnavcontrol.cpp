@@ -30,10 +30,10 @@ int main() {
 	tick[4].attach(&updatePressure, 0.1);
 	
 	while (true) {
-		if (motor.buffer_empty) {
+		if (!motor.isTxEmpty()) {
 			tx_interrupt_motor();
 		}
-		if (pc.tx_empty) {
+		if (!pc.isTxEmpty()) {
 			tx_interrupt_pc();
 		}
 		
@@ -156,10 +156,10 @@ int main() {
 						tx_interrupt_pc();
 						
 						while (true) {
-							if (motor.buffer_empty) {
+							if (!motor.isTxEmpty()) {
 								tx_interrupt_motor();
 							}
-							if (pc.tx_empty) {
+							if (!pc.isTxEmpty()) {
 								tx_interrupt_pc();
 							}
 							imu.getData();
@@ -297,7 +297,7 @@ int main() {
 						
 					default:	// The user typed a key we didn't understand.
 						pc.send_message("Unrecognized command.\n\r");
-						if (pc.tx_empty)
+						if (!pc.isTxEmpty())
 						{
 							tx_interrupt_pc();
 						}

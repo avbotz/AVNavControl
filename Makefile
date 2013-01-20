@@ -16,7 +16,8 @@ $(SRC_PATH)motor.o \
 $(SRC_PATH)pid.o \
 $(SRC_PATH)pid_library.o \
 $(SRC_PATH)global.o \
-$(SRC_PATH)Kalman.o
+$(SRC_PATH)Kalman.o \
+$(SRC_PATH)buffer.o
 
 SYS_OBJECTS = ./export/LPC1768/GCC_CS/startup_LPC17xx.o ./export/LPC1768/GCC_CS/sys.o ./export/LPC1768/GCC_CS/cmsis_nvic.o ./export/LPC1768/GCC_CS/core_cm3.o ./export/LPC1768/GCC_CS/system_LPC17xx.o 
 INCLUDE_PATHS = -I./export -I./export/LPC1768 -I./export/LPC1768/GCC_CS -I$(SRC_PATH)

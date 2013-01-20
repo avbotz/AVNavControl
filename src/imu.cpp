@@ -15,17 +15,13 @@ IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
 	accX = accY = accZ = gyrX = gyrY = gyrZ = magX = magY = magZ = 0;
 	parseNow = false;
 	
-	//intialize the buffers and buffer indicies
-	for (int i = 0; i < IMU_RX_BUFFER_SIZE; i++) {
-		buffer[i] = 0;
-	}
-	i_buffer_write = i_buffer_read = 0;
+	//intialize the buffers
+	rx_buffer = new CircularBuffer(IMU_RX_BUFFER_SIZE);
 	
 	for (int i = 0; i < 1024; i++) {
 		linebuf[i] = 0;
 	}
 	i_linebuf = 0;
-	buffer_overflow = false;
 	
 	// Attach it as an RX interrupt only.
 	
@@ -39,6 +35,7 @@ IMU::~IMU() {
 	if (p_device != NULL) {
 		delete p_device; // prevents memory leaks
 	}
+	delete rx_buffer;
 }
 
 //Wrapper function to write a character to the IMU
@@ -80,12 +77,11 @@ bool IMU::readable() {
 
 void IMU::getData() {
 	// While there is data to be read, or the buffer has overflowed.
-	while (i_buffer_read != i_buffer_write || buffer_overflow) {
-		linebuf[i_linebuf] = buffer[i_buffer_read];
-		i_buffer_read = (i_buffer_read + 1) % IMU_RX_BUFFER_SIZE;
-		buffer_overflow = false;
-		i_linebuf++;
+	while (!rx_buffer->empty || rx_buffer->overflow) {
+		linebuf[i_linebuf++] = rx_buffer->readByte();
 		if (linebuf[i_linebuf - 1] == '#') {
+			//terminate the string
+			linebuf[i_linebuf] = '\0';
 			parseNow = true;
 			break;
 		}
@@ -118,10 +114,7 @@ void IMU::getData() {
 			num++;
 		}
 		
-		// Clear the line buffer.
-		for (int i = 0; i < 1024; i++) {
-			linebuf[i] = 0;
-		}
+		// Clear the line buffer
 		i_linebuf = 0;
 		
 		parseNow = false;
@@ -165,13 +158,11 @@ void rx_interrupt_imu()
 	led2 = !led2;
 	
 	while (imu.p_device->readable()) {
-		imu.buffer[imu.i_buffer_write] = imu.p_device->getc();
 		//pc.putc(imu.buffer[imu.i_buffer_write]);
 		NVIC_DisableIRQ(UART3_IRQn);
-		imu.i_buffer_write = (imu.i_buffer_write + 1) % IMU_RX_BUFFER_SIZE;
+		imu.rx_buffer->writeByte(imu.p_device->getc());
 		NVIC_EnableIRQ(UART3_IRQn);
-		if (imu.i_buffer_write == imu.i_buffer_read) {
-			imu.buffer_overflow = true;
+		if (imu.rx_buffer->overflow) {
 			NVIC_DisableIRQ(UART3_IRQn);
 			break;
 		}

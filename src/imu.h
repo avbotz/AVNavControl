@@ -49,12 +49,10 @@ public:
 private:
 	bool calibrationEnabled;
 	
+	CircularBuffer* rx_buffer;
 	// Stores a line of raw data from the IMU
-	char buffer[IMU_RX_BUFFER_SIZE];
-	int i_buffer_read, i_buffer_write;
 	char linebuf[1024];
 	int i_linebuf;
-	bool buffer_overflow;
 };
 
 void rx_interrupt();

@@ -1,10 +1,12 @@
 #ifndef MOTOR_H
 #define MOTOR_H
 
-#include "mbed.h"
 #include <string>
+
+#include "mbed.h"
 #include "analog.h"
 #include "defs.h"
+#include "buffer.h"
 
 void tx_interrupt_motor();
 void motor_send_wrapper();
@@ -20,11 +22,10 @@ public:
 	void send(int i_motor); // send speed of motor i_motor to the controller
 	void set(unsigned char value); // set and send all the motors to a single value
 	void set(int i_motor, unsigned char value); // set and send motor number i_motor to value
-	char get(int i_motor); // get the current speed for motor number i_motor
+	char get(int i_motor) const; // get the current speed for motor number i_motor
+	bool isTxEmpty() const;		//returns if tx_buffer is empty
 	
 	Serial* p_device; // pointer to our serial object (used to send stuff)
-	
-	bool buffer_empty;
 
 	friend void tx_interrupt_motor();
 	
@@ -42,11 +43,8 @@ private:
 	 */
 
 	char motors[12]; //The controller supports twelve motors. This array locally stores their speeds.
-
 	
-
-	char buffer[MOTOR_TX_BUF_SIZE];
-	int i_buffer_read, i_buffer_write;
+	CircularBuffer* tx_buffer;
 };
 
 extern Motor motor;
