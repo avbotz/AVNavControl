@@ -28,6 +28,11 @@ void PID::setDt(float dt)
 	_dt = dt;
 }
 
+void PID::setMaxI(float m)
+{
+	_integral_max = m;
+}
+
 void PID::setSetpoint(float setpoint)
 {
 	_setpoint = setpoint;
@@ -54,7 +59,11 @@ void PID::reset()
 
 float PID::calculate_i()
 {
-	_integral += _scaledInput * _dt;
+	if (((_integral > -_integral_max) && (_scaledInput < 0))
+	|| ((_integral < _integral_max) && (_scaledInput > 0)))
+	{
+		_integral += _scaledInput * _dt;
+	}
 	return _integral;
 }
 
