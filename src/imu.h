@@ -32,6 +32,7 @@ public:
 	short accX, accY, accZ, 
 		  gyrX, gyrY, gyrZ, 
 		  magX, magY, magZ;
+	int temperature;
 	unsigned short heading; // 0 to 359. current compass heading set by calcHeading()
 	
 	bool parseNow;

@@ -51,12 +51,13 @@ void IMU::parse() {
 	linebuf[i_linebuf] = '\0';
 	//print_serial(p_pc, buf);
 	short temp[9];
+	int temp_temperature;
 	// Check data integrity of sscanf()'s results. sscanf() returns the number
 	// of values that it was able to extract. In this case, there are 9 values
 	// we are reading.
 	// we <3 pointer arithmetic
-	if (sscanf(linebuf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd,%hd#", 
-		temp, temp+1, temp+2, temp+3, temp+4, temp+5, temp+6, temp+7, temp+8) == 9)
+	if (sscanf(linebuf, "\n\r$%hd,%hd,%hd,%hd,%hd,%hd,%d,%hd,%hd,%hd#", 
+		temp, temp+1, temp+2, temp+3, temp+4, temp+5, &temp_temperature, temp+6, temp+7, temp+8) == 9)
 	{
 		accX = temp[0];
 		accY = temp[1];
@@ -64,9 +65,14 @@ void IMU::parse() {
 		gyrX = temp[3];
 		gyrY = temp[4];
 		gyrZ = temp[5];
+		temperature = temp_temperature;
 		magX = temp[6];
 		magY = temp[7];
 		magZ = temp[8];
+		
+		//calculate the actual temperature in degrees celcius from the reading
+		//add the offset, divide by the scale, adjust the number to center around 35
+		temperature = (temperature - 13200) / 280 + 35;
 		
 		// Indicate that we read data successfully.
 		led3 = !led3;
