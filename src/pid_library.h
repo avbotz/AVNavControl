@@ -13,6 +13,7 @@ public:
 	void setScale(float inputScale);
 	void setBias(float bias);
 	void setDt(float dt);
+	void setMaxI(float m);
 	
 	void setSetpoint(float setpoint);
 	void setProcessValue(float processValue);
@@ -23,7 +24,7 @@ public:
 	
 	//the gains for PID
 	float _kp, _ki, _kd;
-	
+
 private:
 	float calculate_i();
 	float calculate_d();
@@ -50,7 +51,11 @@ private:
 	//the current integral term
 	float _integral;
 	
+	
 	float _dt;
 	
 	float _scaledInput;
+	
+	//maximum integral term
+	float _integral_max;
 };
