@@ -55,7 +55,7 @@ void PID::reset()
 float PID::calculate_i()
 {
 
-	if ((_last - _setpoint) * (_processValue - _setpoint) < 0)
+	if ((_last - _setpoint) * (_processValue - _setpoint) <= 0)
 	{
 		_integral = 0.0f;
 	}
