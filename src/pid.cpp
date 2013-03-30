@@ -66,6 +66,14 @@ void init_pid() {
 	pitchPID->setDt(DT);
 	depthPID->setDt(DT);
 	
+	headingPID->setBias(0.0f);
+	pitchPID->setBias(0.0f);
+	depthPID->setBias(0.0f);
+	
+	headingPID->setIntegralRegion(1.0f/6,1.0f/6); //-30 to 30 degrees
+	pitchPID->setIntegralRegion(-1000.0f/35,1000.0f/35);	//-10 to 10 degrees
+	depthPID->setIntegralRegion(-12.0f, 8.0f);	//-3 to 2 feet
+	
 	reset_pid();
 }
 
