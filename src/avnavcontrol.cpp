@@ -65,7 +65,7 @@ int main() {
 		}
 		// Otherwise, we are running in debug mode.
 		else {
-			debug_mode()
+			debug_mode();
 		}
 	}
 }
@@ -215,7 +215,6 @@ void pid_tuning()
 		}
 		
 		char mes = pc.readPC();
-		char mes2;
 		switch (mes) {
 		case 'g':	// Set gains
 			set_gains();
@@ -251,7 +250,7 @@ void set_gains()
 {
 	pc.send_message("Setting gains. Which one? ");
 	tx_interrupt_pc();
-	
+	char mes2;
 	// Block while waiting for next character
 	while (!(mes2 = pc.readPC()));
 	
@@ -301,7 +300,7 @@ void set_setpoint()
 {
 	pc.send_message("Setting setpoint. Which one? ");
 	tx_interrupt_pc();
-	
+	char mes2;
 	while (!(mes2 = pc.readPC()));	//block waiting for next character
 	
 	if (mes2 == 'p' || mes2 == 'd' || mes2 == 'h')
