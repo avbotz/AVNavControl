@@ -28,7 +28,7 @@ void PID::setDt(float dt)
 	_dt = dt;
 }
 
-void setIntegralRegion(float min, float max)
+void PID::setIntegralRegion(float min, float max)
 {
 	_integralMin = min;
 	_integralMax = max;
