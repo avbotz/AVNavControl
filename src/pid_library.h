@@ -13,6 +13,7 @@ public:
 	void setScale(float inputScale);
 	void setBias(float bias);
 	void setDt(float dt);
+	void setIntegralRegion(float min, float max);
 	
 	void setSetpoint(float setpoint);
 	void setProcessValue(float processValue);
@@ -40,6 +41,9 @@ private:
 	//if needed for some reason
 	float _bias;
 
+	//prevent integral windup, so if outside this region, dont integrate the error
+	float _integralMin, _integralMax;
+	
 	//the desired value
 	float _setpoint;
 
