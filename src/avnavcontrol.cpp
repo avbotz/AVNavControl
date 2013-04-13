@@ -6,19 +6,22 @@ float acc_x(0), acc_y(0), acc_z(0);
 unsigned char motorArray[4];
 
 void debug_mode();
-void imu_calibration();
-void imu_direct_access();
-void kill_info();
-void pid_tuning();
-void set_gains();
-void set_setpoint();
-void print_gains();
-void print_setpoint();
-void print_status();
+void pid_tuning_mode();
+
+LocalFileSystem local("local");
+char mode, which_pid;
 
 int main() {
 	init_pid();
 	
+	FILE* config = fopen("/local/config", "r");
+	mode = fgetc(config);
+	debug = (mode != 'R');
+	if (mode == 'P')
+	{
+		which_pid = fgetc(config);
+	}
+	fclose(config);
 	//attach the pc interrupts
 	pc.p_device->attach(&rx_interrupt_pc, Serial::RxIrq);
 	pc.p_device->attach(&tx_interrupt_pc, Serial::TxIrq);
@@ -65,14 +68,26 @@ int main() {
 		}
 		// Otherwise, we are running in debug mode.
 		else {
-			debug_mode();
+			if (mode == 'D')
+			{
+				debug_mode();
+			}
+			if (mode == 'P')
+			{
+				pid_tuning_mode();
+			}
 		}
 	}
 }
 
+void imu_calibration();
+void imu_direct_access();
+void kill_info();
 
 void debug_mode()
 {
+	pc.send_message("Welcome to debug mode\r\n");
+	tx_interrupt_pc();
 	char in;
 	while (true) {
 		// Get the character from the PC.
@@ -88,10 +103,6 @@ void debug_mode()
 				
 		case 'k':	// Print kill switch data.
 			kill_info();
-			break;
-			
-		case 'p':	// PID tuning
-			pid_tuning();
 			break;
 				
 		case '\0':
@@ -188,18 +199,28 @@ void kill_info()
 	}
 }
 
-void pid_tuning()
+void set_gains();
+void set_setpoint();
+void print_gains();
+void print_setpoint();
+void print_status();
+
+void pid_tuning_mode()
 {
 	desHead = 0;
 	desPower = 100;
 	desDepth = 25;
-	
+	/*
 	pc.send_message("Entered PID tuning.\r\n");
 	pc.send_message("g: set gains\r\n");
 	pc.send_message("s: set setpoint\r\n");
 	pc.send_message("p: print gains.\r\n");
 	pc.send_message("d: view status\r\n");
 	tx_interrupt_pc();
+	*/
+	
+	Ticker status;
+	status.attach(&print_status, 0.1);
 	
 	while (true) {
 		if (!motor.isTxEmpty()) {
@@ -223,24 +244,9 @@ void pid_tuning()
 		case 's':	//set setpoint
 			set_setpoint();
 			break;
-			
-		case 'p':
-			print_gains();
-			break;
-			
-		case 'q':
-			print_setpoint();
-			break;
-			
-		case 'd':
-			print_status();
-			break;
 				
 		case '\0':
 			break;
-			
-		default:
-			pc.send_message("what the hell were you thinking?\r\n");
 		}
 		tx_interrupt_pc();
 	}
@@ -248,68 +254,11 @@ void pid_tuning()
 
 void set_gains()
 {
-	pc.send_message("Setting gains. Which one? ");
-	tx_interrupt_pc();
-	char mes2;
-	// Block while waiting for next character
-	while (!(mes2 = pc.readPC()));
-	
-	if (mes2 == 'p' || mes2 == 'd' || mes2 == 'h')
+	//4 integers for each p i and d. divides what you give by 1000. leading zeroes if necessary
+	float gains[3] = {0, 0, 0};
+	for (int g = 0; g < 3; g++)
 	{
-		// Stop the motors
-		motor.set(127);
-		tx_interrupt_motor();
-		//4 integers for each p i and d. divides what you give by 1000. leading zeroes if necessary
-		float gains[3] = {0, 0, 0};
-		for (int g = 0; g < 3; g++)
-		{
-			for (int i = 0; i < 4; i++)
-			{
-				char j;
-				while (!(j = pc.readPC()));
-				if (j < '0' || j > '9') {
-					i--;
-					continue;
-				}
-				gains[g] = gains[g] * 10 + (j - '0');
-			}
-			gains[g] /= 1000;
-		}
-		
-		PID* activePID;
-		switch (mes2)
-		{
-		case 'p':
-			activePID = pitchPID; break;
-		case 'd':
-			activePID = depthPID; break;
-		case 'h':
-			activePID = headingPID; break;
-		}
-		activePID->setGains(gains[0], gains[1], gains[2]);
-		activePID->reset();
-		pc.send_message("gains set\r\n");
-	}
-	else
-	{
-		pc.send_message("no gains for that letter\n\r");
-	}
-}
-
-void set_setpoint()
-{
-	pc.send_message("Setting setpoint. Which one? ");
-	tx_interrupt_pc();
-	char mes2;
-	while (!(mes2 = pc.readPC()));	//block waiting for next character
-	
-	if (mes2 == 'p' || mes2 == 'd' || mes2 == 'h')
-	{
-		//3 integers for set point use leading zeroes if necessary
-		motor.set(127);
-		tx_interrupt_motor();	//kill motors
-		float point = 0;
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 4; i++)
 		{
 			char j;
 			while (!(j = pc.readPC()));
@@ -317,50 +266,78 @@ void set_setpoint()
 				i--;
 				continue;
 			}
-			point = 10 * point + (j - '0');
+			gains[g] = gains[g] * 10 + (j - '0');
 		}
-		
-		PID* activePID;
-		switch (mes2)
-		{
-		case 'p':
-			activePID = pitchPID;   break;
-		case 'd':
-			activePID = depthPID; desDepth = point; break;
-		case 'h':
-			activePID = headingPID; desHead = point; break;
-		}
-		activePID->setSetpoint(point);
-		activePID->reset();
-		
-		pc.send_message("setpoint set\r\n");
+		gains[g] /= 1000;
 	}
-	else
-	{
-		pc.send_message("no setpoint for that letter\r\n");
-	}
-}
-
-void print_gains()
-{
-	char output[100];
 	
-	sprintf(output, "Pitch gains: %f, %f, %f\r\nDepth gains: %f, %f, %f\r\nHeading gains: %f, %f, %f\r\n", 
-			pitchPID->_kp, pitchPID->_ki, pitchPID->_kd,
-			depthPID->_kp, depthPID->_ki, depthPID->_kd,
-			headingPID->_kp, headingPID->_ki, headingPID->_kd);
-	pc.send_message(output);
+	PID* activePID;
+	switch (which_pid)
+	{
+	case 'p':
+		activePID = pitchPID; break;
+	case 'd':
+		activePID = depthPID; break;
+	case 'h':
+		activePID = headingPID; break;
+	}
+	activePID->setGains(gains[0], gains[1], gains[2]);
+	activePID->reset();
+	
+	return;
 }
 
-void print_setpoint()
+void set_setpoint()
 {
-	char out[50];
-	sprintf(out, "Heading setpoint: %d\r\nDepth setpoint: %d\r\n", desHead, desDepth);
-	pc.send_message(out);
+	float point = 0;
+	for (int i = 0; i < 3; i++)
+	{
+		char j;
+		while (!(j = pc.readPC()));
+		if (j < '0' || j > '9') {
+			i--;
+			continue;
+		}
+		point = 10 * point + (j - '0');
+	}
+	
+	PID* activePID;
+	switch (which_pid)
+	{
+	case 'p':
+		activePID = pitchPID;   break;
+	case 'd':
+		activePID = depthPID; desDepth = point; break;
+	case 'h':
+		activePID = headingPID; desHead = point; break;
+	}
+	activePID->setSetpoint(point);
 }
+
 void print_status()
 {
 	char buff[25];
-	sprintf(buff, "Heading: %f\tDepth: %d\tPitch: %f\tKill: %d\r\n", calcH, depth, calcP, isAlive);
+	
+	int error;
+	switch (which_pid)
+	{
+	case 'p': error = (-calcP/45) * 100 + 100; break;
+	case 'd': error = ((float)desDepth - depth) / 120 * 100 + 100; break;
+	case 'h':
+		error = desHead - calcH;
+		if (error > 180)
+		{
+			error -= 360;
+		}
+		if (error < -180)
+		{
+			error += 360;
+		}
+		error = ((float)error) / 180 * 100 + 100;
+		break;
+	}
+	
+	sprintf(buff, "%d\n", error);
 	pc.send_message(buff);
+	tx_interrupt_pc();
 }
