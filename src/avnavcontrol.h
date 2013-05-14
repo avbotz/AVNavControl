@@ -15,6 +15,8 @@ extern volatile bool isAlive;
 
 bool PCreadable, PCsendable;
 
+extern float imu_data[9];
+
 extern bool debug;
 
 #endif

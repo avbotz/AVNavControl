@@ -1,7 +1,23 @@
 #include "pid.h"
 
-Kalman pitchK(MU_X_GYR);
-Kalman rollK(MU_Y_GYR);
+//Average values with IMU on flat surface
+float MU_X_ACC;
+float MU_Y_ACC;
+float MU_Z_ACC;
+// Subtract 256 in the Z direction to account for gravity. According to IMU data
+// sheet, the sensitivity at 2g mode (which is what we are using) is
+// 256 least significant bits per 1 g. Normal Earth gravity = 1 g.
+
+float MU_X_GYR;
+float MU_Y_GYR;
+float MU_Z_GYR;
+
+float MU_X_COM;
+float MU_Y_COM;
+float MU_Z_COM;
+
+Kalman pitchK;
+Kalman rollK;
 
 volatile float calcP, calcH, calcR;
 float accP, accR;
@@ -22,6 +38,8 @@ PID* headingPID = NULL;
 PID* depthPID = NULL;
 
 extern PC pc;
+
+extern LocalFileSystem local;
 
 void reset_pid() {
 	pitchPID->reset();
@@ -74,6 +92,22 @@ void init_pid() {
 	pitchPID->setIntegralRegion(-1000.0f/35,1000.0f/35);	//-10 to 10 degrees
 	depthPID->setIntegralRegion(-12.0f, 8.0f);	//-3 to 2 feet
 	
+	//Read from the log file
+	FILE* calibration_file = fopen("/local/CALIBRAT", "r");
+	fscanf(
+	 calibration_file,
+	 "\t%f\t%f\t%f\r\n\t%f\t%f\t%f\r\n\t%f\t%f\t%f\r\n",
+	 &MU_X_ACC, &MU_Y_ACC, &MU_Z_ACC, 
+	 &MU_X_GYR, &MU_Y_GYR, &MU_Z_GYR,
+	 &MU_X_COM, &MU_Y_COM, &MU_Z_COM 
+	);
+	fclose(calibration_file);
+
+	MU_Z_ACC -= 256.0f;
+
+	pitchK.setBias(MU_X_GYR);
+	rollK.setBias(MU_Y_GYR);
+
 	reset_pid();
 }
 
