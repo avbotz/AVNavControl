@@ -1,8 +1,10 @@
 #include "avnavcontrol.h"
+#include <stdio.h>
 
 volatile int desHead(0), desDepth(2), desPower(100);
 float acc_x(0), acc_y(0), acc_z(0);
 
+float imu_data[9];
 unsigned char motorArray[4];
 
 void debug_mode();
@@ -126,8 +128,7 @@ void imu_calibration()
 	// Tell the IMU to start saving calibration information.
 	imu.setCalibrationEnabled(true);
 	// Give it some time.
-	int* imuCalibrationWait = new int;
-	*imuCalibrationWait = 1000 * 10;
+	int imuCalibrationWait = 1000*10;
 	Timer* time = new Timer();
 	time->start();
 	// Buffer for printing the IMU's calibration progress.
@@ -136,7 +137,7 @@ void imu_calibration()
 	// Initialize to 0 so we don't print a message for time = 0.
 	int lastTime = 0;
 	// Loop until the calibration time is exceeded.
-	while (time->read_ms() < *imuCalibrationWait)
+	while (time->read_ms() < imuCalibrationWait)
 	{
 		// Get the elapsed time from timer.
 		int timeElapsed = time->read_ms();
@@ -157,24 +158,28 @@ void imu_calibration()
 		}
 	}
 	// String to store the information message for PC.
-	char* calibration_message = new char[200];
+	char calibration_message[200];
 	// Print a formatted message to the string.
 	sprintf(
 	 calibration_message,
-	 "IMU averages for last %d ms and %d readings:\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n",
-	 *imuCalibrationWait, imu.num,
+	 "\t%f\t%f\t%f\r\n\t%f\t%f\t%f\r\n\t%f\t%f\t%f\r\n",
 	 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
 	 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
 	 imu.sumMagX/(double)imu.num, imu.sumMagY/(double)imu.num, imu.sumMagZ/(double)imu.num
 	);
+
+	//printf("IMU Calibration for the last %d ms and %d readings:\r\n%s", *imuCalibrationWait, imu.num, calibration_message);
+	
+	//Write the calibration message to a log file.
+	FILE* calibration_file = fopen("/local/CALIBRAT", "w");
+	fprintf(calibration_file, "%s", calibration_message);
+	fclose(calibration_file);	
+
 	// Safely send the string to the PC.
 	pc.send_message(calibration_message);
 	tx_interrupt_pc();
 	// Tell the IMU to stop sending calibration.
 	imu.setCalibrationEnabled(false);
-	// Free the memory used by the string.
-	delete calibration_message;
-	delete imuCalibrationWait;
 	delete time;
 }
 

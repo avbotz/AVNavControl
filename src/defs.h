@@ -13,23 +13,6 @@
 #define SAMPLES_PER_SECOND 70  //measured in Hz
 #define DT 1.0f/SAMPLES_PER_SECOND
 
-// Average values with IMU on flat surface.
-#define MU_X_ACC 8.911609
-#define MU_Y_ACC -11.156992
-#define MU_Z_ACC (230.188654 - 256.0f)
-// Subtract 256 in the Z direction to account for gravity. According to IMU data
-// sheet, the sensitivity at 2g mode (which is what we are using) is
-// 256 least significant bits per 1 g. Normal Earth gravity = 1 g.
-
-#define MU_X_GYR -67.464380
-#define MU_Y_GYR -42.423483
-#define MU_Z_GYR 22.905013
-
-#define MU_X_COM -13.575198
-#define MU_Y_COM -87.109499
-#define MU_Z_COM -164.575198
-
-
 //motors.h
 #define SYNC_BYTE 255
 #define MOTOR_TX_BUF_SIZE 1024
