@@ -326,10 +326,10 @@ void print_status()
 	int error;
 	switch (which_pid)
 	{
-	case 'p': error = (-calcP/45) * 100 + 100; break;
-	case 'd': error = ((float)desDepth - depth) / 120 * 100 + 100; break;
+	case 'p': error = (calcP/45) * 100 + 100; break;
+	case 'd': error = (depth - desDepth) / 120 * 100 + 100; break;
 	case 'h':
-		error = desHead - calcH;
+		error = calcH - desHead;
 		if (error > 180)
 		{
 			error -= 360;

@@ -214,12 +214,12 @@ void update_motors(float hpid, float dpid, float ppid) {
 	pitchPower = ppid * (1 - fabs(dpid));
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
-		motorSpeed[LEFT] = hpid + forwardPower;
-		motorSpeed[RIGHT] = -hpid + forwardPower;
+		motorSpeed[LEFT] = -hpid + forwardPower;
+		motorSpeed[RIGHT] = hpid + forwardPower;
 	}
 	else if (isTurn) {
-		motorSpeed[LEFT] = hpid;
-		motorSpeed[RIGHT] = -hpid;
+		motorSpeed[LEFT] = -hpid;
+		motorSpeed[RIGHT] = hpid;
 	}
 	else {  // isMove && !isTurn
 		motorSpeed[LEFT] = forwardPower;
