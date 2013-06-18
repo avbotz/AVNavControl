@@ -14,8 +14,8 @@
 // TODO: check the magic threshold 0.85f. Too high/low?
 AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
 
-//TODO: I picked 0.85f because that's what kill used. Check this.
-LeakDetector leakDetector(p20, 0.85f); //pin 20
+// Threshold determined experimentally with tap water
+LeakDetector leakDetector(p20, 0.5f); //pin 20
 
 /* 
  * Daniel's was depth = adc_buffer[ADC_PRESS] * 0.361904762 - 101.33333;
