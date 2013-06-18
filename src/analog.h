@@ -65,7 +65,6 @@ private:
 	
 };
 
-extern volatile bool hasLeak;
 void updateLeak();
 
 
@@ -75,6 +74,6 @@ void updateKill();
 extern AnalogKillSwitch kill;
 extern AnalogPressureSensor pressure;
 extern LeakDetector leakDetector;
-extern volatile bool isAlive;
+extern volatile bool isAlive, hasLeak, isLowVoltage;
 
 #endif

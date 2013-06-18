@@ -50,4 +50,3 @@ bool debug = false;
 
 volatile bool isAlive = false;
 volatile int depth(0);
-volatile bool hasLeak = false;

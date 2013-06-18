@@ -17,7 +17,8 @@ $(SRC_PATH)pid.o \
 $(SRC_PATH)pid_library.o \
 $(SRC_PATH)global.o \
 $(SRC_PATH)Kalman.o \
-$(SRC_PATH)buffer.o
+$(SRC_PATH)buffer.o \
+$(SRC_PATH)safety.o
 
 ASSEMBLY = $(SRC_PATH)imu.s \
 $(SRC_PATH)pc.s \
@@ -28,7 +29,8 @@ $(SRC_PATH)pid.s \
 $(SRC_PATH)pid_library.s \
 $(SRC_PATH)global.s \
 $(SRC_PATH)Kalman.s \
-$(SRC_PATH)buffer.s
+$(SRC_PATH)buffer.s \
+$(SRC_PATH)safety.s
 
 #checks if we're on Windows or *nix
 #based on whether the SystemRoot variable
