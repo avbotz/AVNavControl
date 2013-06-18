@@ -11,11 +11,11 @@
 #include "pc.h"
 
 //analoginput.h
-// TODO: check the magic threshold 0.85f. Too high/low?
+// Analog inputs' thresholds need to be around 0.85 because when the mbed's
+// AnalogIn pins are floating, the noise may make them oscillate between 0.0 and
+// 0.6. This avoids false positives/negatives when we're testing out of the sub.
 AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
-
-// Threshold determined experimentally with tap water
-LeakDetector leakDetector(p20, 0.5f); //pin 20
+LeakDetector leakDetector(p20, 0.85f); //pin 20
 
 /* 
  * Daniel's was depth = adc_buffer[ADC_PRESS] * 0.361904762 - 101.33333;
