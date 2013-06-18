@@ -38,7 +38,7 @@ int main() {
 	tick[2].attach(&motor_send_wrapper, DT/2);
 	tick[3].attach(&updateKill, .01);
 	tick[4].attach(&updatePressure, 0.1);
-	tick[5].attach(&updateLeak, .01);
+	tick[5].attach(&updateLeak, 0.01);
 	
 	while (!hasLeak) {
 		if (!motor.isTxEmpty()) {

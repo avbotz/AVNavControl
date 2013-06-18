@@ -86,10 +86,12 @@ LeakDetector::LeakDetector(PinName pin, float thresh) :
 AnalogInput(pin),
 threshold(thresh)
 {
-
+	
 }
 
-LeakDetector::~LeakDetector() {}
+LeakDetector::~LeakDetector() {
+	
+}
 
 void updateLeak()
 {
