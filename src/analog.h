@@ -52,6 +52,19 @@ private:
 	float value, threshold;
 };
 
+class LeakDetector : AnalogInput
+{
+public:
+	LeakDetector(PinName pin, float thresh);
+	~LeakDetector();
+
+	bool getValueThresh();
+
+private:
+	float threshold;
+	
+};
+
 
 void updateKill();
 

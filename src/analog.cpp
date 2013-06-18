@@ -81,6 +81,21 @@ bool AnalogKillSwitch::getValueThresh() {
 	return (getValueRaw() > threshold);
 }
 
+
+LeakDetector::LeakDetector(PinName pin, float thresh) :
+AnalogInput(pin),
+threshold(thresh)
+{
+
+}
+
+LeakDetector::~LeakDetector() {}
+
+bool LeakDetector::getValueThresh()
+{
+	return (getValueRaw() > threshold);
+}
+
 void updateKill() {
 	isAlive = kill.getValueThresh();
 }
