@@ -5,6 +5,7 @@
 
 #include "analog.h"
 
-bool needStop();
+inline bool needStop();
+inline int getEmergencyType();
 
 #endif

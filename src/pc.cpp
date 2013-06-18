@@ -18,14 +18,15 @@ PC::PC(PinName tx, PinName rx, int baud)
  *         'd', AVNav-encoded data for depth (pressure sensor),
  *         'p', AVNav-encoded data for power (motors),
  *         kill switch status (l is dead and k is alive),
+ *         'e', AVNav-encoded code for type of emergency stop
  *         '\n' to terminate the message.
  */
-	mes = new char[12];
+	mes = new char[15];
 	// Copy an initial message to the buffer. The pipe characters (|) will be
 	// replaced with AVNav-encoded numbers when this is actually used. We chose
 	// the pipe character because it cannot be confused with AVNav-encoded
 	// data -- see comments in encode_avnav().
-	strcpy(mes, "h||d||p|||\n");
+	strcpy(mes, "h||d||p|||e||\n");
 }
 
 // The avnav functions encode data into AVNav format: 
@@ -79,6 +80,12 @@ void send_status_pc()
 	// get kill switch value
 	// TODO: is this correct? I assume voltage on kill pin means alive.
 	pc.mes[9] = isAlive ? 'k' : 'l';
+	
+	// Are we in an emergency stop? What kind?
+	avnav_temp = pc.encode_avnav(getEmergencyType());
+	pc.mes[11] = avnav_temp.byte1;
+	pc.mes[12] = avnav_temp.byte2;
+	
 	/*
 				char* tmp;
 			sprintf(tmp, "%d", pressure.getValueCalibrated());

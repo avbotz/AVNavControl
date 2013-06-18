@@ -3,7 +3,30 @@
 volatile bool hasLeak = false, isLowVoltage = false;
 extern volatile bool isAlive;
 
-bool needStop()
+enum EmergencyTypes {
+	NO_EMERGENCY,
+	LEAK,
+	VOLTAGE_LOW,
+	VOLTAGE_HIGH	// not used
+}
+
+inline bool needStop()
 {
 	return (!isAlive | hasLeak | isLowVoltage);
+}
+
+inline int getEmergencyType()
+{
+	if (hasLeak)
+	{
+		return LEAK;
+	}
+	else if (isLowVoltage)
+	{
+		return VOLTAGE_LOW;
+	}
+	else
+	{
+		return NO_EMERGENCY;
+	}
 }

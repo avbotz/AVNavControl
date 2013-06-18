@@ -6,6 +6,7 @@
 #include "analog.h"
 #include "pid.h"
 #include "defs.h"
+#include "safety.h"
 
 struct avnav {
 	char byte1;
