@@ -222,15 +222,16 @@ void update_motors(float hpid, float dpid, float ppid) {
 		}
 	}
 	
-	// If the sub is dead, then turn the motors off. Otherwise, set them to
-	// the values that came out of PID.
+	// If the sub is dead or has an emergency, then turn the motors off.
+	// Otherwise, set them to the values that came out of PID.
 	// Note: When the sub is dead, the kill switch actually cuts power to the
 	// motors, so they stop moving. This is here so that the motors don't start
 	// moving when the sub is unkilled (alive) until we want them to.
-	motorArray[LEFT] = isAlive ? powerNum[LEFT] : 127;
-	motorArray[RIGHT] = isAlive ? powerNum[RIGHT] : 127;
-	motorArray[FRONT] = isAlive ? powerNum[FRONT] : 127;
-	motorArray[BACK] = isAlive ? powerNum[BACK] : 127;
+	bool isRun = !needStop();
+	motorArray[LEFT ] = isRun ? powerNum[LEFT ] : 127;
+	motorArray[RIGHT] = isRun ? powerNum[RIGHT] : 127;
+	motorArray[FRONT] = isRun ? powerNum[FRONT] : 127;
+	motorArray[BACK ] = isRun ? powerNum[BACK ] : 127;
 
 }
 

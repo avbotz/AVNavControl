@@ -11,6 +11,7 @@
 #include "motor.h"
 #include "defs.h"
 #include "pc.h"
+#include "safety.h"
 
 extern Kalman pitchK, rollK;
 
@@ -25,8 +26,6 @@ extern PID* depthPID;
 extern volatile int desHead, desDepth, desPower;
 extern volatile int depth;
 extern bool debug;
-
-extern volatile bool isAlive;
 
 extern unsigned char motorArray[4];
 extern AnalogKillSwitch kill;

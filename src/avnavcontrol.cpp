@@ -40,7 +40,7 @@ int main() {
 	tick[4].attach(&updatePressure, 0.1);
 	tick[5].attach(&updateLeak, 0.01);
 	
-	while (!hasLeak) {
+	while (true) {
 		if (!motor.isTxEmpty()) {
 			tx_interrupt_motor();
 		}
