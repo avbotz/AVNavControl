@@ -14,6 +14,9 @@
 // TODO: check the magic threshold 0.85f. Too high/low?
 AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
 
+//TODO: I picked 0.85f because that's what kill used. Check this.
+LeakDetector leakDetector(p20, 0.85f); //pin 20
+
 /* 
  * Daniel's was depth = adc_buffer[ADC_PRESS] * 0.361904762 - 101.33333;
  * That was based on the dsPIC33FJ family's ADC converter.
@@ -47,3 +50,4 @@ bool debug = false;
 
 volatile bool isAlive = false;
 volatile int depth(0);
+volatile bool hasLeak = false;

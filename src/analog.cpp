@@ -91,6 +91,11 @@ threshold(thresh)
 
 LeakDetector::~LeakDetector() {}
 
+void updateLeak()
+{
+	hasLeak = leakDetector.getValueThresh();
+}
+
 bool LeakDetector::getValueThresh()
 {
 	return (getValueRaw() > threshold);

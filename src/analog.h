@@ -5,7 +5,7 @@
 
 /*
  * Generic class for devices that output analog to the mbed.
- * Currently, these are the pressure sensor and the killswitch.
+ * Currently, these are the pressure sensor, leak detector, and killswitch.
  */
 class AnalogInput {
 public:
@@ -65,12 +65,16 @@ private:
 	
 };
 
+extern volatile bool hasLeak;
+void updateLeak();
+
 
 void updateKill();
 
 //The two analog devices are the killswitch and pressure sensor.
 extern AnalogKillSwitch kill;
 extern AnalogPressureSensor pressure;
+extern LeakDetector leakDetector;
 extern volatile bool isAlive;
 
 #endif

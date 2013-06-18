@@ -30,7 +30,7 @@ int main() {
 	imu.p_device->attach(&rx_interrupt_imu, Serial::RxIrq);
 	
 	//create the tickers here
-	Ticker tick[5];
+	Ticker tick[6];
 	if (!debug) {
 		tick[0].attach(&send_status_pc, 0.1);
 	}
@@ -38,8 +38,9 @@ int main() {
 	tick[2].attach(&motor_send_wrapper, DT/2);
 	tick[3].attach(&updateKill, .01);
 	tick[4].attach(&updatePressure, 0.1);
+	tick[5].attach(&updateLeak, .01);
 	
-	while (true) {
+	while (!hasLeak) {
 		if (!motor.isTxEmpty()) {
 			tx_interrupt_motor();
 		}
