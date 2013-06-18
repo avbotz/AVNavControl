@@ -95,7 +95,12 @@ LeakDetector::~LeakDetector() {
 
 void updateLeak()
 {
-	hasLeak = leakDetector.getValueThresh();
+	// If we already detected water, we don't want to enable again even if the
+	// water has moved to a different part of the sub.
+	if (!hasLeak)
+	{
+		hasLeak = leakDetector.getValueThresh();
+	}
 }
 
 bool LeakDetector::getValueThresh()
