@@ -8,14 +8,14 @@ enum EmergencyTypes {
 	LEAK,
 	VOLTAGE_LOW,
 	VOLTAGE_HIGH	// not used
-}
+};
 
-inline bool needStop()
+bool needStop()
 {
 	return (!isAlive | hasLeak | isLowVoltage);
 }
 
-inline int getEmergencyType()
+int getEmergencyType()
 {
 	if (hasLeak)
 	{
