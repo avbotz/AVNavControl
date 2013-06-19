@@ -34,14 +34,14 @@ $(SRC_PATH)buffer.s
 #based on whether the SystemRoot variable
 #is set (its the variable to the Windows directory
 #so should always be set in windows
+# Windows
 ifdef SystemRoot
    RM = del /Q
-   FixPath = $(subst /,\,$1)
+   FixPath = $(subst /,\,$(1))
+# Linux or OS X (gcc4mbed won't run on platforms other than these three)
 else
-   ifeq ($(shell uname), Linux)
-      RM = rm -f
-      FixPath = $1
-   endif
+   RM = rm -f
+   FixPath = $(1)
 endif
 
 SYS_OBJECTS = ./export/LPC1768/GCC_CS/startup_LPC17xx.o ./export/LPC1768/GCC_CS/sys.o ./export/LPC1768/GCC_CS/cmsis_nvic.o ./export/LPC1768/GCC_CS/core_cm3.o ./export/LPC1768/GCC_CS/system_LPC17xx.o 
