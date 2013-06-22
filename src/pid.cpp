@@ -228,13 +228,13 @@ void update_motors(float hpid, float dpid, float ppid) {
 	
 	if (isPitch) {
 		//signs probably arent correct
-		motorSpeed[FRONT] = -dpid + pitchPower;
-		motorSpeed[BACK] = -dpid - pitchPower;
+		motorSpeed[FRONT] = dpid + pitchPower;
+		motorSpeed[BACK] = dpid - pitchPower;
 	}
 	//should never be used cuz assume always pitched
 	else {
 		motorSpeed[FRONT] = dpid;
-		motorSpeed[BACK] = -1.0f * dpid;
+		motorSpeed[BACK] = dpid;
 	}
 	int powerNum[4];
 	motorSpeed[RIGHT] *= 0.9; //because the right motor is stronger

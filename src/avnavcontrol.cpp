@@ -85,6 +85,7 @@ int main() {
 void imu_calibration();
 void imu_direct_access();
 void kill_info();
+void pressure_info();
 
 void debug_mode()
 {
@@ -106,7 +107,11 @@ void debug_mode()
 		case 'k':	// Print kill switch data.
 			kill_info();
 			break;
-				
+		
+		case 'p':
+			pressure_info();
+			break;
+			
 		case '\0':
 			break;
 				
@@ -200,7 +205,32 @@ void kill_info()
 		// Make it flush the PC buffer.
 		tx_interrupt_pc();
 		// Wait 1s between each message.
-		wait_ms(1000);
+		wait_ms(100);
+	}
+}
+
+void pressure_info()
+{
+	char pressinfo[20];
+	int count = 0;
+	float average = 0;
+	motor.set(FRONT, 0);
+	motor.set(BACK, 254);
+	motor.set(LEFT, 127);
+	motor.set(RIGHT, 127);
+	tx_interrupt_motor();
+	
+	while (true) {
+		count++;
+		average+=pressure.getValueRaw();
+		if (count % 100 == 0)
+		{
+			sprintf(pressinfo, "pressure: %f\n\r", average/100);
+			pc.send_message(pressinfo);
+			tx_interrupt_pc();
+			average = 0;
+		}
+		wait_ms(100);
 	}
 }
 
@@ -327,7 +357,7 @@ void print_status()
 	switch (which_pid)
 	{
 	case 'p': error = (calcP/45) * 100 + 100; break;
-	case 'd': error = (depth - desDepth) / 120 * 100 + 100; break;
+	case 'd': error = (desDepth - depth) * 100 / 120 + 100; break;
 	case 'h':
 		error = calcH - desHead;
 		if (error > 180)

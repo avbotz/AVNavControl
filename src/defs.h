@@ -39,12 +39,12 @@
 #define PITCH_KI 0.0f
 #define PITCH_KD 0.0f
 
-#define HEADING_KP 1.0f
-#define HEADING_KI 0.2f
-#define HEADING_KD 0.0f
+#define HEADING_KP 2.5f
+#define HEADING_KI 0.75f
+#define HEADING_KD 0.5f
 
-#define DEPTH_KP 0.9f
-#define DEPTH_KI 0.2f
-#define DEPTH_KD 0.0f
+#define DEPTH_KP 1.0f
+#define DEPTH_KI 0.1f
+#define DEPTH_KD 0.2f
 
 #endif
