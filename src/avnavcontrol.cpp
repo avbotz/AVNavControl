@@ -38,6 +38,12 @@ int main() {
 	tick[2].attach(&motor_send_wrapper, DT/2);
 	tick[3].attach(&updateKill, .01);
 	tick[4].attach(&updatePressure, 0.1);
+
+	if (autoCalibrateIMU)
+	{
+		while (!isAlive);
+		imu_calibration();
+	}
 	
 	while (true) {
 		if (!motor.isTxEmpty()) {
@@ -110,8 +116,11 @@ void debug_mode()
 
 void imu_calibration()
 {
-	pc.send_message("Begin IMU calibration.\r\n");
-	tx_interrupt_pc();
+	if (debug)
+	{
+		pc.send_message("Begin IMU calibration.\r\n");
+		tx_interrupt_pc();
+	}
 	// Tell the IMU to start saving calibration information.
 	imu.setCalibrationEnabled(true);
 	// Give it some time.
@@ -145,17 +154,31 @@ void imu_calibration()
 			lastTime = timeElapsed;
 		}
 	}
-	// String to store the information message for PC.
-	char* calibration_message = new char[200];
-	// Print a formatted message to the string.
-	sprintf(
-	 calibration_message,
-	 "IMU averages for last %d ms and %d readings:\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n",
-	 *imuCalibrationWait, imu.num,
-	 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
-	 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
-	 imu.sumMagX/(double)imu.num, imu.sumMagY/(double)imu.num, imu.sumMagZ/(double)imu.num
-	);
+
+	if (debug)
+	{
+		// String to store the information message for PC.
+		char* calibration_message = new char[200];
+		// Print a formatted message to the string.
+		sprintf(
+		 calibration_message,
+		 "IMU averages for last %d ms and %d readings:\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n\t%f,\t%f,\t%f\r\n",
+		 *imuCalibrationWait, imu.num,
+		 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
+		 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
+		 imu.sumMagX/(double)imu.num, imu.sumMagY/(double)imu.num, imu.sumMagZ/(double)imu.num
+		);
+	}
+	else
+	{
+		//set new calibrated values
+		imu.setConstants(
+		 imu.sumAccX/(double)imu.num, imu.sumAccY/(double)imu.num, imu.sumAccZ/(double)imu.num,
+		 imu.sumGyrX/(double)imu.num, imu.sumGyrY/(double)imu.num, imu.sumGyrZ/(double)imu.num,
+		 imu.sumMagX/(double)imu.num, imu.sumMagY/(double)imu.num, imu.sumMagZ/(double)imu.num
+		);
+	}
+
 	// Safely send the string to the PC.
 	pc.send_message(calibration_message);
 	tx_interrupt_pc();

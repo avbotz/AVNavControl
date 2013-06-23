@@ -141,6 +141,20 @@ void IMU::directAccess() {
 	}
 }
 
+void IMU::setConstants(double xAcc, double yAcc, double zAcc, double xGyr,
+	double yGyr, double zGyr, double xCom, double yCom, double zCom)
+{
+	MU_X_ACC = xAcc;
+	MU_Y_ACC = xAcc;
+	MU_Z_ACC = zAcc;
+	MU_X_GYR = xGyr;
+	MU_Y_GYR = yGyr;
+	MU_Z_GYR = zGyr;
+	MU_X_COM = xCom;
+	MU_Y_COM = yCom;
+	MU_Z_COM = zCom;
+}
+
 void IMU::setCalibrationEnabled(bool isEnabled) {
 	calibrationEnabled = isEnabled;
 	// If we're turning calibration on, clear the variables that stored the old

@@ -44,6 +44,7 @@ DigitalOut led1(LED1), // Kill status. On means alive.
            led4(LED4); // IMU: toggled when a character is copied from buffer to linebuf.
 
 bool debug = false;
+bool autoCalibrateIMU = false;
 
 volatile bool isAlive = false;
 volatile int depth(0);
