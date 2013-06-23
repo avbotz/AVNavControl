@@ -48,3 +48,19 @@ bool autoCalibrateIMU = false;
 
 volatile bool isAlive = false;
 volatile int depth(0);
+
+// Average values with IMU on flat surface.
+double MU_X_ACC = 27.888451;
+double MU_Y_ACC = 30.980315;
+double MU_Z_ACC = (245.883202 - 256.0f);
+// Subtract 256 in the Z direction to account for gravity. According to IMU data
+// sheet, the sensitivity at 2g mode (which is what we are using) is
+// 256 least significant bits per 1 g. Normal Earth gravity = 1 g.
+
+double MU_X_GYR = -58.106299;
+double MU_Y_GYR = 17.059055;
+double MU_Z_GYR = 11.618110;
+
+double MU_X_COM = -58.242588;
+double MU_Y_COM = -114.202156;
+double MU_Z_COM = -25.672507;

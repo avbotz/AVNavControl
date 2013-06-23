@@ -7,7 +7,6 @@
 //imu.h
 #define IMU_RX_BUFFER_SIZE 1024
 
-
 //Kalman.h
 #define GYRO_SCALE	1/14.375f  //degrees per LSB
 #define SAMPLES_PER_SECOND 70  //measured in Hz
