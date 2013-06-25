@@ -45,5 +45,5 @@ DigitalOut led1(LED1), // Kill status. On means alive.
 
 bool debug = false;
 
-volatile bool isAlive = false;
+volatile bool isAlive = false, isAlivePrev = false;
 volatile int depth(0);
