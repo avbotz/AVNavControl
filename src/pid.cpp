@@ -171,7 +171,7 @@ void do_pid() {
 	else {
 		dHC = dHS;
 	}
-
+/*
 	//don't attempt to correct heading if less than 5 degrees off, just move
 	if (fabs(dHC-calcH) < 5) {
 		isTurn = false;
@@ -182,11 +182,16 @@ void do_pid() {
 		isTurn = true;
 		isMove = true;
 	}
+	*/
+	isTurn = true;
+	isMove = fabs(dHC-calcH) < 15;
 	//if too far off then don't move, just turn
+	/*
 	else {
 		isTurn = true;
 		isMove = false;
 	}
+	*/
 	//always correct for pitch
 	isPitch = true;
 	
@@ -214,12 +219,12 @@ void update_motors(float hpid, float dpid, float ppid) {
 	pitchPower = ppid * (1 - fabs(dpid));
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
-		motorSpeed[LEFT] = -hpid + forwardPower;
-		motorSpeed[RIGHT] = hpid + forwardPower;
+		motorSpeed[LEFT] = hpid + forwardPower;
+		motorSpeed[RIGHT] = -hpid + forwardPower;
 	}
 	else if (isTurn) {
-		motorSpeed[LEFT] = -hpid;
-		motorSpeed[RIGHT] = hpid;
+		motorSpeed[LEFT] = hpid;
+		motorSpeed[RIGHT] = -hpid;
 	}
 	else {  // isMove && !isTurn
 		motorSpeed[LEFT] = forwardPower;
@@ -229,7 +234,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 	if (isPitch) {
 		//signs probably arent correct
 		motorSpeed[FRONT] = dpid + pitchPower;
-		motorSpeed[BACK] = dpid - pitchPower;
+		motorSpeed[BACK] = dpid -  pitchPower;
 	}
 	//should never be used cuz assume always pitched
 	else {
@@ -237,7 +242,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 		motorSpeed[BACK] = dpid;
 	}
 	int powerNum[4];
-	motorSpeed[RIGHT] *= 0.9; //because the right motor is stronger
+	motorSpeed[RIGHT] *= .848; //because the right motor is stronger
 	motorSpeed[BACK] *= -1;  //because the back motor is backwards
 	
 	//motorSpeed is a number around zero so the following scales them 0 - 254 which the motors require

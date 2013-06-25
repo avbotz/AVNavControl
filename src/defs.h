@@ -17,8 +17,8 @@
 #define SYNC_BYTE 255
 #define MOTOR_TX_BUF_SIZE 1024
 
-#define LEFT 0
-#define RIGHT 1
+#define RIGHT 0
+#define LEFT 1
 #define FRONT 2
 #define BACK 3
 
@@ -41,7 +41,7 @@
 
 #define HEADING_KP 2.5f
 #define HEADING_KI 0.75f
-#define HEADING_KD 0.5f
+#define HEADING_KD 0.25f
 
 #define DEPTH_KP 1.0f
 #define DEPTH_KI 0.1f
