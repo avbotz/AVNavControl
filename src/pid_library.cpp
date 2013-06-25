@@ -61,10 +61,13 @@ void PID::reset()
 
 float PID::calculate_i()
 {
-	if (_integralMin <= _scaledInput && _scaledInput <= _integralMax)
+	if (_integralMin <= _scaledInput && _scaledInput <= _integralMax ||
+		_scaledInput < _integralMin && _integral > 0 ||
+		_scaledInput > _integralMax && _integral < 0)
 	{
 		_integral += _scaledInput * _dt;
 	}
+	
 	return _integral;
 }
 

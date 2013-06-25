@@ -2,9 +2,8 @@
 
 
 // Initialize a kalman filter with a bias (or the gyroscope's offset from 0).
-Kalman::Kalman(float g_bias) {
+Kalman::Kalman() {
 	angle = 0;
-	bias = g_bias;
 	
 	/*
 	 * We initialize the covariance matrix to a zero matrix
@@ -24,6 +23,11 @@ Kalman::Kalman(float g_bias) {
 
 Kalman::~Kalman() {
 
+}
+
+void Kalman::setBias(float g_bias)
+{
+	bias = g_bias;
 }
 
 /*

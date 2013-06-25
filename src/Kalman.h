@@ -12,11 +12,12 @@
 
 class Kalman {
 public:
-	Kalman(float g_bias);
+	Kalman();
 	~Kalman();
 
 	float calculate(int gyroReading, float accTheta);
-	
+	void setBias(float g_bias);
+
 private:
 	// Kalman filter data
 	float
