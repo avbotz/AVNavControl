@@ -21,7 +21,7 @@ AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
  * Adding 0.5 so that it rounds correctly.
  * The resistor that we're using on the pressure sensor is 2.2K ohms.
  */
-AnalogPressureSensor pressure(p17, 347.32, -65.668);
+AnalogPressureSensor pressure(p17, 435.19, -100.85);
 
 // Page that maps pins to UART numbers.
 // http://mbed.org/users/mbed714/notebook/uart-mapping/

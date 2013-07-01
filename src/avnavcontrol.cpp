@@ -223,14 +223,14 @@ void pressure_info()
 	while (true) {
 		count++;
 		average+=pressure.getValueRaw();
-		if (count % 100 == 0)
+		if (count % 20 == 0)
 		{
-			sprintf(pressinfo, "pressure: %f\n\r", average/100);
+			sprintf(pressinfo, "pressure: %f\n\r", average/20);
 			pc.send_message(pressinfo);
 			tx_interrupt_pc();
 			average = 0;
 		}
-		wait_ms(100);
+		wait_ms(50);
 	}
 }
 
