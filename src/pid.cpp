@@ -117,6 +117,11 @@ void do_pid() {
 	float ppid, hpid, dpid;
 	
 	//check kill state, maybe reset
+	if (isAlivePrev == false && isAlive == true)
+	{
+		reset_pid();
+	}
+	
 	//check imu data
 	//maybe get new compass reading
 	//char* test;
@@ -207,7 +212,6 @@ void do_pid() {
 
 void get_compass() {
 
-
 }
 
 void update_motors(float hpid, float dpid, float ppid) {
@@ -276,12 +280,9 @@ void update_motors(float hpid, float dpid, float ppid) {
 	motorArray[RIGHT] = isAlive ? powerNum[RIGHT] : 127;
 	motorArray[FRONT] = isAlive ? powerNum[FRONT] : 127;
 	motorArray[BACK] = isAlive ? powerNum[BACK] : 127;
-
 }
 
-
 void give_data(int accx, int accy, int accz, int gyrx, int gyry, int gyrz) {
-
 	accX = accx;
 	accY = accy;
 	accZ = accz;
