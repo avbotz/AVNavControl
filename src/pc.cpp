@@ -148,7 +148,8 @@ char PC::readPC()
 	
 	while ((rx_buffer->hasData(4) &&		//make sure there are 4 characters to be read 
 			rx_buffer->peek(3) == '\n') ||	//and the fourth character is a newline
-			rx_buffer->overflow) {
+			rx_buffer->overflow)
+	{
 			
 		avnav temp;
 		switch (rx_buffer->readByte()) {

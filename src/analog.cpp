@@ -82,5 +82,6 @@ bool AnalogKillSwitch::getValueThresh() {
 }
 
 void updateKill() {
+	isAlivePrev = isAlive;
 	isAlive = kill.getValueThresh();
 }
