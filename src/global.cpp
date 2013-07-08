@@ -35,7 +35,7 @@ IMU imu(p9, p10, 57600, &pc);
 
 //motor.h
 // pins 13, 14 = UART 1
-Motor motor(4, 9600, p13, p14);
+Motor motor(5, 9600, p13, p14);
 
 DigitalOut led1(LED1),	// Kill status
            led2(LED2),	// debug
@@ -47,5 +47,5 @@ bool debug = false;
 //dropPositions[0] = value mbed should send the Pololu when nothing is to be dropped.
 //dropPositions[1] = value mbed should send the Pololu when one markers is to be dropped.
 //dropPositions[2] = extrapolate
-int dropPositions[3] = {0, 127, 254};
+unsigned char dropPositions[3] = {0, 127, 254};
 

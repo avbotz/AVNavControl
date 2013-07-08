@@ -15,7 +15,7 @@ bool isAlive = false;
 bool PCreadable, PCsendable;
 
 extern bool debug;
-extern int dropPositions[3];
+extern unsigned char dropPositions[3];
 
 
 // Do not remove

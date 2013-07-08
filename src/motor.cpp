@@ -56,10 +56,12 @@ void Motor::send(int i_motor) {
 	putc(motors[i_motor]);
 }
 
+// Minus 1 to stop dropper from turing into 127 (drop marker state)
 void Motor::set(unsigned char value) {
-	for (int i = 0; i < num_motors; i++) {
+	for (int i = 0; i < (num_motors-1); i++) {
 		set(i, value);
 	}
+	set(4, (unsigned char)0);
 }
 
 void Motor::set(int i_motor, unsigned char value) {
