@@ -219,13 +219,12 @@ void update_motors(float hpid, float dpid, float ppid) {
 	float forwardPower, pitchPower;
 
 	//desPower is between 0 and 200, 0 is full speed backwards, extrapolate.
-	hpid = (hpid < -1) ? -1 : ((hpid > 1) ? 1 : hpid);
-	dpid = (dpid < -1) ? -1 : ((dpid > 1) ? 1 : dpid);
-	ppid = (ppid < -1) ? -1 : ((ppid > 1) ? 1 : ppid);
-	
+//	hpid = (hpid < -1) ? -1 : ((hpid > 1) ? 1 : hpid);
+//	dpid = (dpid < -1) ? -1 : ((dpid > 1) ? 1 : dpid);
+//	ppid = (ppid < -1) ? -1 : ((ppid > 1) ? 1 : ppid);
 	
 	forwardPower = (100 - desPower) * 0.02f * (1 - fabs(hpid));
-	pitchPower = ppid * (1 - fabs(dpid));
+	pitchPower = ppid * (1 - fabs(dpid)*.1);
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
 		motorSpeed[LEFT] = hpid + forwardPower;

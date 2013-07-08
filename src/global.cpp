@@ -21,7 +21,7 @@ AnalogKillSwitch kill(p16, p18, 0.85f); // Vin, Vout
  * Adding 0.5 so that it rounds correctly.
  * The resistor that we're using on the pressure sensor is 2.2K ohms.
  */
-AnalogPressureSensor pressure(p17, 435.19, -100.85);
+AnalogPressureSensor pressure(p17, 435.19, -85.85);
 
 // Page that maps pins to UART numbers.
 // http://mbed.org/users/mbed714/notebook/uart-mapping/
@@ -36,7 +36,7 @@ IMU imu(p9, p10, 57600, &pc);
 
 //motor.h
 // pins 13, 14 = UART 1
-Motor motor(4, 9600, p13, p14);
+Motor motor(4, 9600, p28, p27);
 
 DigitalOut led1(LED1), // Kill status. On means alive.
            led2(LED2), // IMU: toggled when a character is received.
