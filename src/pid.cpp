@@ -33,6 +33,8 @@ bool isMove;
 bool isTurn;
 bool isPitch;
 
+float spinUpScale;
+
 PID* pitchPID = NULL;
 PID* headingPID = NULL;
 PID* depthPID = NULL;
@@ -120,6 +122,7 @@ void do_pid() {
 	if (isAlivePrev == false && isAlive == true)
 	{
 		reset_pid();
+		spinUpScale = 0.0f;
 	}
 	
 	//check imu data
@@ -268,6 +271,19 @@ void update_motors(float hpid, float dpid, float ppid) {
 		else {
 			powerNum[i] = 127;
 		}
+	}
+	
+	// The voltage (and therefore current) applied to the motors will increase
+	// slowly when the sub is unkilled. This will reduce stress on the batteries
+	// and prevent the mbed from resetting.
+	if (spinUpScale < 1.0f)
+	{
+		powerNum[LEFT ] *= spinUpScale;
+		powerNum[RIGHT] *= spinUpScale;
+		powerNum[FRONT] *= spinUpScale;
+		powerNum[BACK ] *= spinUpScale;
+		
+		spinUpScale += DT / SPINUP_TIME;
 	}
 	
 	// If the sub is dead, then turn the motors off. Otherwise, set them to

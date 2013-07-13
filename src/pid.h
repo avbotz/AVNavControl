@@ -29,6 +29,7 @@ extern volatile int depth;
 extern bool debug;
 
 extern volatile bool isAlive, isAlivePrev;
+extern volatile bool isSpinUp;
 
 extern unsigned char motorArray[4];
 extern AnalogKillSwitch kill;
