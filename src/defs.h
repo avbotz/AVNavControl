@@ -11,11 +11,12 @@
 //Kalman.h
 #define GYRO_SCALE	1/14.375f  //degrees per LSB
 #define SAMPLES_PER_SECOND 70  //measured in Hz
-#define DT 1.0f/SAMPLES_PER_SECOND
+#define DT (1.0f/SAMPLES_PER_SECOND)
 
 //motors.h
 #define SYNC_BYTE 255
 #define MOTOR_TX_BUF_SIZE 1024
+#define SPINUP_TIME 2.0f //seconds
 
 #define RIGHT 0
 #define LEFT 1
