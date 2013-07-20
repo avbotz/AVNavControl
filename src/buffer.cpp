@@ -1,4 +1,5 @@
 #include "buffer.h"
+#include "pc.h"
 
 CircularBuffer::CircularBuffer(int size)
 {
@@ -48,7 +49,15 @@ bool CircularBuffer::hasData(int n) const
 	//just add n to figure out the last byte that will need to be read
 	//otherwise, we have to loop around to the front of the buffer to check the last
 	//byte that will be read
-	return ((i_read + n) < size)?((i_read + n) <= i_write):((i_read + n) % size <= i_write);
+	
+	if (i_write >= i_read)
+	{
+		return (i_write - i_read) >= n;
+	}
+	else
+	{
+		return (i_write - i_read + size) >= n;
+	}
 }
 
 char CircularBuffer::peek(int n) const

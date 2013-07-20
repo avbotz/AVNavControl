@@ -41,10 +41,11 @@ int main() {
 	}
 	tick[1].attach(&do_pid, DT);
 	tick[2].attach(&motor_send_wrapper, DT/2);
-	tick[3].attach(&updateKill, .01);
+	tick[3].attach(&updateKill, DT);	//cannot run faster than PID so that PID knows when to reset
 	tick[4].attach(&updatePressure, 0.1);
 	
 	while (true) {
+		
 		if (!motor.isTxEmpty()) {
 			tx_interrupt_motor();
 		}

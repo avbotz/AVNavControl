@@ -27,8 +27,10 @@ public:
 	~AnalogPressureSensor();
 	
 	int getValueCalibrated();
-private:
+	void changeB(float new_b);
 	float m, b;
+private:
+	
 };
 
 extern volatile int depth;

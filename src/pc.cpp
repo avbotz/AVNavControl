@@ -11,6 +11,7 @@ PC::PC(PinName tx, PinName rx, int baud)
 	
 	tx_buffer = new CircularBuffer(PC_BUFFER_SIZE);
 	rx_buffer = new CircularBuffer(PC_BUFFER_SIZE);
+	
 
 /*
  * This is the buffer for the message that will be sent to the BeagleBoard.
@@ -101,9 +102,9 @@ void PC::send_message(const char* message)
 
 void PC::putc(char c)
 {
-	NVIC_DisableIRQ(UART1_IRQn);
+	NVIC_DisableIRQ(UART0_IRQn);
 	tx_buffer->writeByte(c);
-	NVIC_EnableIRQ(UART1_IRQn);
+	NVIC_EnableIRQ(UART0_IRQn);
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
 }
 
@@ -114,11 +115,20 @@ bool PC::isTxEmpty() const
 
 void tx_interrupt_pc()
 {
-	while (pc.p_device->writeable() && !pc.tx_buffer->empty) {
-		pc.p_device->putc(pc.tx_buffer->readByte());
+	while (!pc.tx_buffer->empty)
+	{
+		if (pc.p_device->writeable())
+		{
+			pc.p_device->putc(pc.tx_buffer->readByte());
+		}
 	}
+	
+//	while (pc.p_device->writeable() && !pc.tx_buffer->empty) {
+//		pc.p_device->putc(pc.tx_buffer->readByte());
+//	}
+
 	if (pc.tx_buffer->empty) {
-		NVIC_DisableIRQ(UART1_IRQn);
+	//	NVIC_DisableIRQ(UART0_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
 }
@@ -130,7 +140,7 @@ void rx_interrupt_pc()
 		pc.rx_buffer->writeByte(pc.p_device->getc());
 		NVIC_EnableIRQ(UART0_IRQn);
 		if (pc.rx_buffer->overflow) {
-			NVIC_DisableIRQ(UART0_IRQn);
+	//		NVIC_DisableIRQ(UART0_IRQn);
 			break;
 		}
 	}
@@ -145,12 +155,19 @@ char PC::readPC()
 		if (rx_buffer->empty) return 0;
 		else return rx_buffer->readByte();
 	}
-	
-	while ((rx_buffer->hasData(4) &&		//make sure there are 4 characters to be read 
-			rx_buffer->peek(3) == '\n') ||	//and the fourth character is a newline
-			rx_buffer->overflow)
+	while (rx_buffer->hasData(4) &&
+			!rx_buffer->peek(3) == '\n')
 	{
-			
+		//throw out the data cuz its bad
+		rx_buffer->readByte();
+	}
+	
+	NVIC_DisableIRQ(UART0_IRQn);
+	while ((rx_buffer->hasData(4) &&		//make sure there are 4 characters to be read 
+			rx_buffer->peek(3) == '\n'))// ||	//and the fourth character is a newline
+		//	rx_buffer->overflow)
+	{
+		
 		avnav temp;
 		switch (rx_buffer->readByte()) {
 			//read 2 bytes, process them, and set the right variables
@@ -171,8 +188,9 @@ char PC::readPC()
 			desired_power = decode_avnav(temp);
 			break;
 		}
-
 		rx_buffer->readByte();	//advance past the newline
+		
 	}
+	NVIC_EnableIRQ(UART0_IRQn);
 	return 1;
 }

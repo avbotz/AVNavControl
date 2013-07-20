@@ -51,7 +51,18 @@ void reset_pid() {
 	fAccZ = MU_Z_ACC;
 	fGyrZ = MU_Z_GYR;
 
+	float pressure_average = 0;
+	for (int i = 0; i < 5; i++)
+	{
+		pressure_average += pressure.getValueCalibrated();
+		wait_ms(100);
+	}
+	pressure_average /= 5;
+	float new_b = pressure.b - pressure_average;
+	pressure.changeB(new_b);
+
 	calcP = calcH = calcR = 0;
+//	pc.send_message("\n\nhello\n\n");
 }
 
 void init_pid() {
@@ -224,7 +235,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 //	ppid = (ppid < -1) ? -1 : ((ppid > 1) ? 1 : ppid);
 	
 	forwardPower = (100 - desPower) * 0.02f * (1 - fabs(hpid));
-	pitchPower = ppid * (1 - fabs(dpid)*.1);
+	pitchPower = ppid * (1/(fabs(dpid)+1));
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
 		motorSpeed[LEFT] = hpid + forwardPower;
@@ -279,6 +290,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 	motorArray[RIGHT] = isAlive ? powerNum[RIGHT] : 127;
 	motorArray[FRONT] = isAlive ? powerNum[FRONT] : 127;
 	motorArray[BACK] = isAlive ? powerNum[BACK] : 127;
+	
 }
 
 void give_data(int accx, int accy, int accz, int gyrx, int gyry, int gyrz) {

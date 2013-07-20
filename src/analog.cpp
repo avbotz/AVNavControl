@@ -1,5 +1,8 @@
 #include "analog.h"
 
+#include "pc.h"
+extern PC pc;
+
 AnalogInput::AnalogInput(PinName pin) {
 	p_analog = new AnalogIn(pin);
 }
@@ -14,6 +17,11 @@ AnalogInput::~AnalogInput() {
 // shouldn't be used unless you actually want the noisy value.
 float AnalogInput::getValueRaw() {
 	return p_analog->read();
+}
+
+void AnalogPressureSensor::changeB(float new_b)
+{
+	b = new_b;
 }
 
 AnalogPressureSensor::

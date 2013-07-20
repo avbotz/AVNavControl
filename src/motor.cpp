@@ -29,9 +29,9 @@ Motor::~Motor() {
 }
 
 void Motor::putc(char c) {
-	NVIC_DisableIRQ(UART1_IRQn);
+	NVIC_DisableIRQ(UART2_IRQn);
 	tx_buffer->writeByte(c);
-	NVIC_EnableIRQ(UART1_IRQn);
+	NVIC_EnableIRQ(UART2_IRQn);
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
 }
 
@@ -76,7 +76,7 @@ void tx_interrupt_motor() {
 		motor.p_device->putc(motor.tx_buffer->readByte());
 	}
 	if (motor.tx_buffer->empty) {
-		NVIC_DisableIRQ(UART1_IRQn);
+//		NVIC_DisableIRQ(UART2_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
 }
