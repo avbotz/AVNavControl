@@ -34,7 +34,7 @@ public:
 	Ticker* pc_ticker;
 
 	bool isTxEmpty() const;
-
+	CircularBuffer* tx_buffer,* rx_buffer;
 private:
 	friend void rx_interrupt_pc();
 	friend void tx_interrupt_pc();
@@ -43,7 +43,7 @@ private:
 	char* mes;
 	int message_length;
 	
-	CircularBuffer* tx_buffer,* rx_buffer;
+	
 
 };
 

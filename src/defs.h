@@ -18,8 +18,8 @@
 #define MOTOR_TX_BUF_SIZE 1024
 
 #define RIGHT 0
-#define LEFT 1
-#define FRONT 2
+#define FRONT 1
+#define LEFT 2
 #define BACK 3
 
 
@@ -29,17 +29,19 @@
 
 //pid.h
 
+#define DEAD_TIME 5000
+
 //PID tuning constants change to tune
 //the first list is the most used ones
 //change them to tune, the second list
 //are the ones used by the mbed, they
 //are different and not intuitive
 
-#define PITCH_KP 0.015f
+#define PITCH_KP 0.012f
 #define PITCH_KI 0.005f
-#define PITCH_KD 0.005f
+#define PITCH_KD 0.007f
 
-#define HEADING_KP 2.5f
+#define HEADING_KP 4.0f
 #define HEADING_KI 0.75f
 #define HEADING_KD 0.25f
 

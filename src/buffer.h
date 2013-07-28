@@ -15,9 +15,10 @@ public:
 	bool hasData(int n) const;	//returns whether the buffer has n unread bytes
 	char peek(int n) const;		//returns what is n bytes ahead of the current read index
 	
+	int i_read, i_write, size;
 private:
 	char* buffer;
-	int i_read, i_write, size;
+	
 };
 
 #endif

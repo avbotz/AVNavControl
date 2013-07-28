@@ -40,7 +40,7 @@ int main() {
 		tick[0].attach(&send_status_pc, 0.1);
 	}
 	tick[1].attach(&do_pid, DT);
-	tick[2].attach(&motor_send_wrapper, DT/2);
+	tick[2].attach(&motor_send_wrapper, DT);
 	tick[3].attach(&updateKill, DT);	//cannot run faster than PID so that PID knows when to reset
 	tick[4].attach(&updatePressure, 0.1);
 	
@@ -266,6 +266,7 @@ void pid_tuning_mode()
 			tx_interrupt_pc();
 		}
 		imu.getData();
+		desDepth = 10;
 		give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
 		for (int i = 0; i < 4; i++) {
 			motor.set(i, motorArray[i]);

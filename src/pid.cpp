@@ -41,6 +41,9 @@ extern PC pc;
 
 extern LocalFileSystem local;
 
+int pid_loops_since_alive = 0;
+float pressure_average = 0;
+
 void reset_pid() {
 	pitchPID->reset();
 	headingPID->reset();
@@ -50,17 +53,9 @@ void reset_pid() {
 	fAccY = MU_Y_ACC;
 	fAccZ = MU_Z_ACC;
 	fGyrZ = MU_Z_GYR;
-
-	float pressure_average = 0;
-	for (int i = 0; i < 5; i++)
-	{
-		pressure_average += pressure.getValueCalibrated();
-		wait_ms(100);
-	}
-	pressure_average /= 5;
-	float new_b = pressure.b - pressure_average;
-	pressure.changeB(new_b);
-
+	
+	pressure_average = 0;
+	
 	calcP = calcH = calcR = 0;
 //	pc.send_message("\n\nhello\n\n");
 }
@@ -130,6 +125,7 @@ void do_pid() {
 	//check kill state, maybe reset
 	if (isAlivePrev == false && isAlive == true)
 	{
+		pid_loops_since_alive = DEAD_TIME*SAMPLES_PER_SECOND/1000;
 		reset_pid();
 	}
 	
@@ -233,9 +229,9 @@ void update_motors(float hpid, float dpid, float ppid) {
 //	hpid = (hpid < -1) ? -1 : ((hpid > 1) ? 1 : hpid);
 //	dpid = (dpid < -1) ? -1 : ((dpid > 1) ? 1 : dpid);
 //	ppid = (ppid < -1) ? -1 : ((ppid > 1) ? 1 : ppid);
-	
-	forwardPower = (100 - desPower) * 0.02f * (1 - fabs(hpid));
-	pitchPower = ppid * (1/(fabs(dpid)+1));
+//	dpid = 0;
+	forwardPower = (100 - desPower) * 0.02f * (1/(fabs(3*hpid)+1));//(1 - fabs(hpid));
+	pitchPower = ppid * (1/(fabs(dpid/4)+1));
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
 		motorSpeed[LEFT] = hpid + forwardPower;
@@ -264,7 +260,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 	int powerNum[4];
 	motorSpeed[RIGHT] *= .848; //because the right motor is stronger
 	motorSpeed[BACK] *= -1;  //because the back motor is backwards
-	
+	//motorSpeed[FRONT] *= .7;	//the front motor is new
 	//motorSpeed is a number around zero so the following scales them 0 - 254 which the motors require
 	for (int i = 0; i < 4; i++) {
 		powerNum[i] = motorSpeed[i] * 56;
@@ -281,15 +277,40 @@ void update_motors(float hpid, float dpid, float ppid) {
 		}
 	}
 	
+	if (pid_loops_since_alive)
+	{
+		if (pid_loops_since_alive % (SAMPLES_PER_SECOND/10) == 0)
+		{
+			pressure_average += pressure.getValueCalibrated();
+		}
+		
+		if (pid_loops_since_alive == 1)
+		{
+			pressure_average /= (DEAD_TIME/100);
+			float new_b = pressure.b - pressure_average;
+			pressure.changeB(new_b);
+		}
+			
+		--pid_loops_since_alive;
+		motorArray[LEFT] = 127;
+		motorArray[RIGHT] = 127;
+		motorArray[FRONT] = 127;
+		motorArray[BACK] = 127;
+		calcH = 0.0f;		
+	}
+	
+	else
+	{
 	// If the sub is dead, then turn the motors off. Otherwise, set them to
 	// the values that came out of PID.
 	// Note: When the sub is dead, the kill switch actually cuts power to the
 	// motors, so they stop moving. This is here so that the motors don't start
 	// moving when the sub is unkilled (alive) until we want them to.
-	motorArray[LEFT] = isAlive ? powerNum[LEFT] : 127;
-	motorArray[RIGHT] = isAlive ? powerNum[RIGHT] : 127;
-	motorArray[FRONT] = isAlive ? powerNum[FRONT] : 127;
-	motorArray[BACK] = isAlive ? powerNum[BACK] : 127;
+		motorArray[LEFT] = isAlive ? powerNum[LEFT] : 127;
+		motorArray[RIGHT] = isAlive ? powerNum[RIGHT] : 127;
+		motorArray[FRONT] = isAlive ? powerNum[FRONT] : 127;
+		motorArray[BACK] = isAlive ? powerNum[BACK] : 127;
+	}
 	
 }
 

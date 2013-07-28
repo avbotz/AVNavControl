@@ -55,8 +55,6 @@ int PC::decode_avnav(avnav data) {
 	return ((data.byte1 - 0x20) << 6) | (data.byte2 - 0x20);
 }
 
-extern float ppower;
-
 void send_status_pc()
 {
 	avnav avnav_temp;
