@@ -231,7 +231,7 @@ void update_motors(float hpid, float dpid, float ppid) {
 //	ppid = (ppid < -1) ? -1 : ((ppid > 1) ? 1 : ppid);
 //	dpid = 0;
 	forwardPower = (100 - desPower) * 0.02f * (1/(fabs(3*hpid)+1));//(1 - fabs(hpid));
-	pitchPower = ppid * (1/(fabs(dpid/4)+1));
+	depthPower = dpid * (1/(fabs(ppid/4)+1));
 	//right motor is more powerful than left, back motor is runs in reverse of the others
 	if (isMove && isTurn) {
 		motorSpeed[LEFT] = hpid + forwardPower;
@@ -248,8 +248,8 @@ void update_motors(float hpid, float dpid, float ppid) {
 	
 	if (isPitch) {
 		//signs probably arent correct
-		motorSpeed[FRONT] = dpid - pitchPower;
-		motorSpeed[BACK] = dpid +  pitchPower;
+		motorSpeed[FRONT] = depthPower - ppid;
+		motorSpeed[BACK] = depthPower +  ppid;
 	}
 	//should never be used cuz assume always pitched
 	else {
