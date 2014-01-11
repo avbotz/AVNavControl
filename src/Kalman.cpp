@@ -2,7 +2,8 @@
 
 
 // Initialize a kalman filter with a bias (or the gyroscope's offset from 0).
-Kalman::Kalman() {
+Kalman::Kalman()
+{
 	angle = 0;
 	
 	/*
@@ -21,7 +22,8 @@ Kalman::Kalman() {
 
 }
 
-Kalman::~Kalman() {
+Kalman::~Kalman()
+{
 
 }
 
@@ -34,7 +36,8 @@ void Kalman::setBias(float g_bias)
  * Evaluate a kalman filter. The math here has been proven solid. Don't touch
  * it unless you really need to.
  */
-float Kalman::calculate(int gyroReading, float accTheta) {
+float Kalman::calculate(int gyroReading, float accTheta)
+{
 	/*
 	 * Update the predicted angle based on the previous
 	 * angle and the new gyroscope reading.

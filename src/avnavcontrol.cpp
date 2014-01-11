@@ -13,7 +13,8 @@ void pid_tuning_mode();
 LocalFileSystem local("local");
 char mode, which_pid;
 
-int main() {
+int main()
+{
 	init_pid();
 	
 	FILE* config = fopen("/local/config", "r");
@@ -36,7 +37,8 @@ int main() {
 	
 	//create the tickers here
 	Ticker tick[5];
-	if (!debug) {
+	if (!debug)
+	{
 		tick[0].attach(&send_status_pc, 0.1);
 	}
 	tick[1].attach(&do_pid, DT);
@@ -44,7 +46,8 @@ int main() {
 	tick[3].attach(&updateKill, DT);	//cannot run faster than PID so that PID knows when to reset
 	tick[4].attach(&updatePressure, 0.1);
 	
-	while (true) {
+	while (true)
+	{
 		
 		if (!motor.isTxEmpty()) {
 			tx_interrupt_motor();
@@ -59,7 +62,8 @@ int main() {
 		imu.getData();
 		
 		// If we are running in normal (AKA production or competition) mode.
-		if (!debug) {
+		if (!debug)
+		{
 			pc.readPC();
 			desHead = pc.desired_heading;
 			desPower = pc.desired_power;
@@ -70,7 +74,8 @@ int main() {
 			}
 		}
 		// Otherwise, we are running in debug mode.
-		else {
+		else
+		{
 			if (mode == 'D')
 			{
 				debug_mode();
@@ -93,10 +98,12 @@ void debug_mode()
 	pc.send_message("Welcome to debug mode\r\n");
 	tx_interrupt_pc();
 	char in;
-	while (true) {
+	while (true)
+	{
 		// Get the character from the PC.
 		in = pc.readPC();
-		switch (in) {
+		switch (in)
+		{
 		case 'c':
 			imu_calibration();
 			break;
@@ -198,7 +205,8 @@ void kill_info()
 	// Buffer to hold the message.
 	char killinfo[20];
 	// Loop until reset
-	while (true) {
+	while (true)
+	{
 		// Fill the buffer with the message
 		sprintf(killinfo, "kill: %f\n\r", kill.getValueRaw());
 		// Safely send the buffer to the PC.
@@ -221,7 +229,8 @@ void pressure_info()
 	motor.set(RIGHT, 127);
 	tx_interrupt_motor();
 	
-	while (true) {
+	while (true)
+	{
 		count++;
 		average+=pressure.getValueRaw();
 		if (count % 20 == 0)
@@ -258,22 +267,27 @@ void pid_tuning_mode()
 	Ticker status;
 	status.attach(&print_status, 0.1);
 	
-	while (true) {
-		if (!motor.isTxEmpty()) {
+	while (true)
+	{
+		if (!motor.isTxEmpty())
+		{
 			tx_interrupt_motor();
 		}
-		if (!pc.isTxEmpty()) {
+		if (!pc.isTxEmpty())
+		{
 			tx_interrupt_pc();
 		}
 		imu.getData();
 		desDepth = 10;
 		give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
-		for (int i = 0; i < 4; i++) {
+		for (int i = 0; i < 4; i++)
+		{
 			motor.set(i, motorArray[i]);
 		}
 		
 		char mes = pc.readPC();
-		switch (mes) {
+		switch (mes)
+		{
 		case 'g':	// Set gains
 			set_gains();
 			break;
@@ -299,7 +313,8 @@ void set_gains()
 		{
 			char j;
 			while (!(j = pc.readPC()));
-			if (j < '0' || j > '9') {
+			if (j < '0' || j > '9')
+			{
 				i--;
 				continue;
 			}
@@ -331,7 +346,8 @@ void set_setpoint()
 	{
 		char j;
 		while (!(j = pc.readPC()));
-		if (j < '0' || j > '9') {
+		if (j < '0' || j > '9')
+		{
 			i--;
 			continue;
 		}

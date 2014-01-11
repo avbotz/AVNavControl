@@ -3,19 +3,23 @@
 #include "pc.h"
 extern PC pc;
 
-AnalogInput::AnalogInput(PinName pin) {
+AnalogInput::AnalogInput(PinName pin)
+{
 	p_analog = new AnalogIn(pin);
 }
 
-AnalogInput::~AnalogInput() {
-	if (p_analog != NULL) {
+AnalogInput::~AnalogInput()
+{
+	if (p_analog != NULL)
+	{
 		delete p_analog;
 	}
 }
 
 // Returns the raw value of the device. This is a noisy value and probably
 // shouldn't be used unless you actually want the noisy value.
-float AnalogInput::getValueRaw() {
+float AnalogInput::getValueRaw()
+{
 	return p_analog->read();
 }
 
@@ -26,12 +30,14 @@ void AnalogPressureSensor::changeB(float new_b)
 
 AnalogPressureSensor::
 AnalogPressureSensor(PinName pin, float calibration_m, float calibration_b) : 
-AnalogInput(pin) {
+AnalogInput(pin)
+{
 	m = calibration_m;
 	b = calibration_b;
 }
 
-AnalogPressureSensor::~AnalogPressureSensor() {
+AnalogPressureSensor::~AnalogPressureSensor()
+{
 	
 }
 
@@ -43,18 +49,21 @@ AnalogPressureSensor::~AnalogPressureSensor() {
  * y = calibrated pressure sensor reading (feet)
  * We add 0.5 to y so that it rounds correctly when we truncate into an integer.
  */
-int AnalogPressureSensor::getValueCalibrated() {
+int AnalogPressureSensor::getValueCalibrated()
+{
 	return (int)(getValueRaw() * m + b + 0.5f);
 }
 
-void updatePressure() {
+void updatePressure()
+{
 	depth = pressure.getValueCalibrated();
 }
 
 // The AnalogKillSwitch class basically sets up two pins on the mbed to act like
 // an ohmmeter.
 AnalogKillSwitch::AnalogKillSwitch(PinName Vin, PinName Vout, float thresh) :
-AnalogInput(Vin) {
+AnalogInput(Vin)
+{
 	threshold = thresh;
 	value = thresh;
 	p_Vout = new AnalogOut(Vout);
@@ -62,11 +71,13 @@ AnalogInput(Vin) {
 	p_Vout->write(1.0f);
 }
 
-AnalogKillSwitch::~AnalogKillSwitch() {
+AnalogKillSwitch::~AnalogKillSwitch()
+{
 	// TODO: does the AnalogOut class automatically change the voltage to 0 when
 	// it gets destroyed?
 	// p_Vout->write(0.0f);
-	if (p_Vout != NULL) {
+	if (p_Vout != NULL)
+	{
 		delete p_Vout;
 	}
 }
@@ -76,7 +87,8 @@ AnalogKillSwitch::~AnalogKillSwitch() {
  * is not thresholded. It is not "raw" because it is the raw data from the
  * sensor.
  */
-float AnalogKillSwitch::getValueRaw() {
+float AnalogKillSwitch::getValueRaw()
+{
 	// TODO: test this averaging code. Is it enough?
 	value = (AnalogInput::getValueRaw() + value) / 2;
 	return value;
@@ -85,11 +97,13 @@ float AnalogKillSwitch::getValueRaw() {
 /* 
  * Returns true if the raw value exceeds the threshold passed into the constructor
  */
-bool AnalogKillSwitch::getValueThresh() {
+bool AnalogKillSwitch::getValueThresh()
+{
 	return (getValueRaw() > threshold);
 }
 
-void updateKill() {
+void updateKill()
+{
 	isAlivePrev = isAlive;
 	isAlive = kill.getValueThresh();
 }

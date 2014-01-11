@@ -7,7 +7,8 @@
 #include "motor.h"
 
 // MiniSSC2's Constructor
-Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
+Motor::Motor(int num_motors, int baud, PinName tx, PinName rx)
+{
 
 	this->num_motors = num_motors;
 	p_device = new Serial(tx, rx); // (tx, rx) opens up new serial device (p_device is Serial* pointer)
@@ -20,7 +21,8 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx) {
 }
 
 // MiniSSC2's Destructor
-Motor::~Motor() {
+Motor::~Motor()
+{
 	if (p_device != NULL) {
 		// must do this. otherwise, you'll have memory leakage & you may not be able to re-open the serial port later
 		delete p_device;
@@ -28,24 +30,29 @@ Motor::~Motor() {
 	delete tx_buffer;
 }
 
-void Motor::putc(char c) {
+void Motor::putc(char c)
+{
 	NVIC_DisableIRQ(UART2_IRQn);
 	tx_buffer->writeByte(c);
 	NVIC_EnableIRQ(UART2_IRQn);
 	// Don't worry about overflow because if you're 1024 chars behind you're FUBAR already
 }
 
-void motor_send_wrapper() {
+void motor_send_wrapper()
+{
 	motor.send();
 }
 
-void Motor::send() {
-	for (int i = 0; i < num_motors; i++) {
+void Motor::send()
+{
+	for (int i = 0; i < num_motors; i++)
+	{
 		send(i);
 	}
 }
 
-void Motor::send(int i_motor) {
+void Motor::send(int i_motor)
+{
 	// format: {sync byte, motor id, motor power}
 	// example: {SYNC_BYTE, 2, 24} sets motor 2 to power level 24
 	putc(SYNC_BYTE);
@@ -53,29 +60,37 @@ void Motor::send(int i_motor) {
 	putc(motors[i_motor]);
 }
 
-void Motor::set(unsigned char value) {
-	for (int i = 0; i < num_motors; i++) {
+void Motor::set(unsigned char value)
+{
+	for (int i = 0; i < num_motors; i++)
+	{
 		set(i, value);
 	}
 }
 
-void Motor::set(int i_motor, unsigned char value) {
+void Motor::set(int i_motor, unsigned char value)
+{
 	motors[i_motor] = value;
 }
 
-char Motor::get(int i_motor) const {
+char Motor::get(int i_motor) const
+{
 	return motors[i_motor];
 }
 
-bool Motor::isTxEmpty() const {
+bool Motor::isTxEmpty() const
+{
 	return motor.tx_buffer->empty;
 }
 
-void tx_interrupt_motor() {
-	while (motor.p_device->writeable() && !motor.tx_buffer->empty) {
+void tx_interrupt_motor()
+{
+	while (motor.p_device->writeable() && !motor.tx_buffer->empty)
+	{
 		motor.p_device->putc(motor.tx_buffer->readByte());
 	}
-	if (motor.tx_buffer->empty) {
+	if (motor.tx_buffer->empty)
+	{
 //		NVIC_DisableIRQ(UART2_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}

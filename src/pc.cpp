@@ -41,7 +41,8 @@ PC::PC(PinName tx, PinName rx, int baud)
 // byte is a command or data. Downside is that the data is less human-readable,
 // but it's not like the BeagleBoard is a person or sentient being.
 
-avnav PC::encode_avnav(int data) {
+avnav PC::encode_avnav(int data)
+{
 	avnav encoded;
 	
 	data &= 0x3fff;
@@ -51,7 +52,8 @@ avnav PC::encode_avnav(int data) {
 	return encoded;
 }
 
-int PC::decode_avnav(avnav data) {
+int PC::decode_avnav(avnav data)
+{
 	return ((data.byte1 - 0x20) << 6) | (data.byte2 - 0x20);
 }
 
@@ -92,7 +94,8 @@ void PC::send_message(const char* message)
 	int i = 0;
 	// Loop until message[i] becomes zero (null) because strings in C are
 	// terminated by a zero/null character.
-	while (message[i]) {
+	while (message[i])
+	{
 		putc(message[i]);
 		i++;
 	}
@@ -121,11 +124,13 @@ void tx_interrupt_pc()
 		}
 	}
 	
-//	while (pc.p_device->writeable() && !pc.tx_buffer->empty) {
+//	while (pc.p_device->writeable() && !pc.tx_buffer->empty)
+//	{
 //		pc.p_device->putc(pc.tx_buffer->readByte());
 //	}
 
-	if (pc.tx_buffer->empty) {
+	if (pc.tx_buffer->empty)
+	{
 	//	NVIC_DisableIRQ(UART0_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
@@ -133,11 +138,13 @@ void tx_interrupt_pc()
 
 void rx_interrupt_pc()
 {
-	while (pc.p_device->readable()) {
+	while (pc.p_device->readable())
+	{
 		NVIC_DisableIRQ(UART0_IRQn);
 		pc.rx_buffer->writeByte(pc.p_device->getc());
 		NVIC_EnableIRQ(UART0_IRQn);
-		if (pc.rx_buffer->overflow) {
+		if (pc.rx_buffer->overflow)
+		{
 	//		NVIC_DisableIRQ(UART0_IRQn);
 			break;
 		}
@@ -149,7 +156,8 @@ void rx_interrupt_pc()
 //otherwise it reads characters and updates the desired stuff
 char PC::readPC()
 {
-	if (debug) {
+	if (debug)
+	{
 		if (rx_buffer->empty) return 0;
 		else return rx_buffer->readByte();
 	}
@@ -167,7 +175,8 @@ char PC::readPC()
 	{
 		
 		avnav temp;
-		switch (rx_buffer->readByte()) {
+		switch (rx_buffer->readByte())
+		{
 			//read 2 bytes, process them, and set the right variables
 			//the last increment skips the newline
 		case 'h':

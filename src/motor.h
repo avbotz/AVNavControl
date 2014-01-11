@@ -13,7 +13,8 @@ void motor_send_wrapper();
 
 // Stores values for and communicates with the motor controller.
 // We use the Mini SSC II format. This is used to control the motors and move the sub.
-class Motor {
+class Motor
+{
 public:
 	Motor(int num_motors, int baud, PinName tx, PinName rx);
 	~Motor();

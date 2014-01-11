@@ -10,7 +10,8 @@
 
 void rx_interrupt_imu();
 
-class IMU {
+class IMU
+{
 // TODO: Figure out which functions and variables can be private.
 public:
 	IMU(PinName tx, PinName rx, int baud, PC* pc);

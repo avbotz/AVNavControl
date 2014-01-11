@@ -10,7 +10,8 @@
  * of the submarine.
  */
 
-class Kalman {
+class Kalman
+{
 public:
 	Kalman();
 	~Kalman();
