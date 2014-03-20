@@ -51,8 +51,9 @@ void IMU::putc(char c)
 // Checks data integrity of buffer, then stores the IMU values into variables.
 void IMU::parse()
 {
+	// Null terminate the buffer just in case (for string safety)
 	linebuf[i_linebuf] = '\0';
-	//print_serial(p_pc, buf);
+	
 	short temp[9];
 	// Check data integrity of sscanf()'s results. sscanf() returns the number
 	// of values that it was able to extract. In this case, there are 9 values
@@ -87,7 +88,10 @@ void IMU::getData()
 	// While there is data to be read, or the buffer has overflowed.
 	while (!rx_buffer->empty || rx_buffer->overflow)
 	{
+		// Throw a char into the buffer
 		linebuf[i_linebuf++] = rx_buffer->readByte();
+		led4 = !led4;
+		// If we reached the end of a set of IMU data (by receiving '#')
 		if (linebuf[i_linebuf - 1] == '#')
 		{
 			//terminate the string
@@ -95,7 +99,6 @@ void IMU::getData()
 			parseNow = true;
 			break;
 		}
-		led4 = !led4;
 	}
 	
 	NVIC_EnableIRQ(UART3_IRQn);
@@ -103,12 +106,9 @@ void IMU::getData()
 	if (parseNow)
 	{
 		parse();
-		
-		/*
-		 * IMU Calibration Code
-		 * Calculates the average values of all sensors in order to set biases. 
-		 * The IMU should be flat when you run this code.
-		 */
+
+		// The IMU should be flat when you run this calibration.
+		// Calculates the average values of all sensors in order to set biases.
 		if (calibrationEnabled)
 		{
 			sumAccX += accX;
@@ -173,6 +173,7 @@ void rx_interrupt_imu()
 	// Indicate that the interrupt was called.
 	led2 = !led2;
 	
+	// While there are characters to be read from the IMU
 	while (imu.p_device->readable())
 	{
 		//pc.putc(imu.buffer[imu.i_buffer_write]);

@@ -61,24 +61,23 @@ void send_status_pc()
 {
 	avnav avnav_temp;
 
-	// Construct the message to the BeagleBoard based on state of the sub.
-	// get heading value
+	// Construct the message to the computer based on state of the sub.
+	// get & encode heading value
 	avnav_temp = pc.encode_avnav(calcH);	//back motor
 	pc.mes[1] = avnav_temp.byte1;
 	pc.mes[2] = avnav_temp.byte2;
 	
-	// get depth (pressure sensor) value
+	// depth (pressure sensor)
 	avnav_temp = pc.encode_avnav(depth);	//front motor
 	pc.mes[4] = avnav_temp.byte1;
 	pc.mes[5] = avnav_temp.byte2;
 	
-	// get power (motor) value
+	// power (motor)
 	avnav_temp = pc.encode_avnav(desPower);
 	pc.mes[7] = avnav_temp.byte1;
 	pc.mes[8] = avnav_temp.byte2;
 	
-	// get kill switch value
-	// TODO: is this correct? I assume voltage on kill pin means alive.
+	// kill switch
 	pc.mes[9] = isAlive ? 'k' : 'l';
 	/*
 				char* tmp;
@@ -92,8 +91,7 @@ void send_status_pc()
 void PC::send_message(const char* message)
 {
 	int i = 0;
-	// Loop until message[i] becomes zero (null) because strings in C are
-	// terminated by a zero/null character.
+	// Loop while the character is not a null terminator
 	while (message[i])
 	{
 		putc(message[i]);
@@ -158,9 +156,16 @@ char PC::readPC()
 {
 	if (debug)
 	{
-		if (rx_buffer->empty) return 0;
-		else return rx_buffer->readByte();
+		if (rx_buffer->empty)
+		{
+			return 0;
+		}
+		else
+		{
+			return rx_buffer->readByte();
+		}
 	}
+	
 	while (rx_buffer->hasData(4) &&
 			!rx_buffer->peek(3) == '\n')
 	{
@@ -170,8 +175,7 @@ char PC::readPC()
 	
 	NVIC_DisableIRQ(UART0_IRQn);
 	while ((rx_buffer->hasData(4) &&		//make sure there are 4 characters to be read 
-			rx_buffer->peek(3) == '\n'))// ||	//and the fourth character is a newline
-		//	rx_buffer->overflow)
+			rx_buffer->peek(3) == '\n'))	//and the fourth character is a newline
 	{
 		
 		avnav temp;

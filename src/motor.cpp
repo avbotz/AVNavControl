@@ -12,9 +12,11 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx)
 
 	this->num_motors = num_motors;
 	p_device = new Serial(tx, rx); // (tx, rx) opens up new serial device (p_device is Serial* pointer)
-	// Settings for Mini Maestro serial -- see Mini Maestro data sheet
+	// Settings for Mini Maestro serial.
+	// See Mini Maestro data sheet and mbed API for explanation.
 	p_device->format(8, Serial::None, 1);
-	p_device->baud(baud); // Set the baud.
+	p_device->baud(baud);
+
 	tx_buffer = new CircularBuffer(MOTOR_TX_BUF_SIZE);
 	
 	set(127);   // The motors should start stationary (zero power)
@@ -23,8 +25,10 @@ Motor::Motor(int num_motors, int baud, PinName tx, PinName rx)
 // MiniSSC2's Destructor
 Motor::~Motor()
 {
-	if (p_device != NULL) {
-		// must do this. otherwise, you'll have memory leakage & you may not be able to re-open the serial port later
+	if (p_device != NULL)
+	{
+		// Good practice for memory management to delete/free stuff, but in
+		// reality, motor's destructor will never be called.
 		delete p_device;
 	}
 	delete tx_buffer;

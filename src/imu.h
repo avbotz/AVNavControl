@@ -16,6 +16,7 @@ public:
 	IMU(PinName tx, PinName rx, int baud, PC* pc);
 	~IMU();
 	
+	// TODO: no longer necessary; interrupts can bind to members. See mbed API.
 	friend void rx_interrupt_imu();
 	
 	void putc(char);
@@ -49,7 +50,7 @@ private:
 	bool calibrationEnabled;
 	
 	CircularBuffer* rx_buffer;
-	// Stores a line of raw data from the IMU
+	// Stores a line of raw text from the IMU
 	char linebuf[1024];
 	int i_linebuf;
 };
