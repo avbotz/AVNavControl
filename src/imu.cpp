@@ -12,7 +12,7 @@ IMU::IMU(PinName tx, PinName rx, int baud, PC* pc)
 	
 	// Calibration variables
 	calibrationEnabled = false;
-	
+
 	accX = accY = accZ = gyrX = gyrY = gyrZ = magX = magY = magZ = 0;
 	parseNow = false;
 	
@@ -165,8 +165,6 @@ void IMU::setCalibrationEnabled(bool isEnabled)
 	if (isEnabled)
 	{
 		sumAccX = sumAccY = sumAccZ = sumGyrX = sumGyrY = sumGyrZ = sumMagX = sumMagY = sumMagZ = num = 0;
-		minGyrX = minGyrY = minGyrZ = INT_MAX;
-		maxGyrX = maxGyrY = maxGyrZ = -INT_MAX;
 	}
 }
 
