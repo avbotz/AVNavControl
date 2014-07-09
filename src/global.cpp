@@ -43,6 +43,9 @@ DigitalOut led1(LED1), // Kill status. On means alive.
            led3(LED3), // IMU: toggled when a buffer is parsed.
            led4(LED4); // IMU: toggled when a character is copied from buffer to linebuf.
 
+// Pin that controls the Dropper state
+DigitalOut dropperRelay(p8);
+
 bool debug = false;
 
 volatile bool isAlive = false, isAlivePrev = false;

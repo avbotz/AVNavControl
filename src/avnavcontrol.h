@@ -19,4 +19,6 @@ extern float imu_data[9];
 
 extern bool debug;
 
+extern DigitalOut dropperRelay;
+
 #endif
