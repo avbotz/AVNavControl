@@ -15,7 +15,7 @@ char mode, which_pid;
 
 int desDropper(0);
 int prevDropper(0);
-Ticker dropperTicker;
+Timeout dropperTicker;
 void dropper_callback();
 
 int main()
@@ -81,7 +81,7 @@ int main()
 			{
 				prevDropper = desDropper;
 				dropperRelay = 0;
-				dropperTicker.attach(dropper_callback, 1.0f);
+				dropperTicker.attach(&dropper_callback, 3.0f);
 			}
 			
 			give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
@@ -413,6 +413,5 @@ void print_status()
 
 void dropper_callback()
 {
-	dropperTicker.detach();
 	dropperRelay = 1;
 }
