@@ -49,4 +49,10 @@
 #define DEPTH_KI 0.1f
 #define DEPTH_KD 0.2f
 
+// motor multipliers
+#define RIGHT_MULTIPLIER .848 // right is stronger
+#define FRONT_MULTIPLIER 1
+#define LEFT_MULTIPLIER 1
+#define BACK_MULTIPLIER -.8 // back is backwards and stronger
+
 #endif
