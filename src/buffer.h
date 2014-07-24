@@ -3,7 +3,8 @@
 
 #include "mbed.h"
 
-struct CircularBuffer {
+struct CircularBuffer
+{
 public:
 	CircularBuffer(int size);
 	~CircularBuffer();

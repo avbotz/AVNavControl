@@ -44,7 +44,8 @@ extern LocalFileSystem local;
 int pid_loops_since_alive = 0;
 float pressure_average = 0;
 
-void reset_pid() {
+void reset_pid()
+{
 	pitchPID->reset();
 	headingPID->reset();
 	depthPID->reset();
@@ -60,7 +61,8 @@ void reset_pid() {
 //	pc.send_message("\n\nhello\n\n");
 }
 
-void init_pid() {
+void init_pid()
+{
 	pitchPID = new PID();
 	headingPID = new PID();
 	depthPID = new PID();
@@ -117,7 +119,8 @@ void init_pid() {
 	reset_pid();
 }
 
-void do_pid() {
+void do_pid()
+{
 	//if(debug || isAlive) return;
 	//dammit adit
 	float ppid, hpid, dpid;
@@ -159,9 +162,12 @@ void do_pid() {
 	calcH += (MU_Z_GYR - fGyrZ) * GYRO_SCALE * DT;
 
 	//360 degrees in a circle so we want our heading between 0 and 360
-	if (calcH >= 360) {
+	if (calcH >= 360)
+	{
 		calcH -= 360;
-	} else if (calcH < 0) {
+	}
+	else if (calcH < 0)
+	{
 		calcH += 360;
 	}
 
@@ -174,23 +180,28 @@ void do_pid() {
 	 * This block of code ensures that we use the smallest interval to get to the desired heading.
 	 * For example, going from h=2 to h=359 moves CCW 3 degrees instead of CW 357 degrees.
 	 */
-	if ( (fabs(dHA - calcH) < fabs(dHB - calcH)) && (fabs(dHA - calcH) < fabs(dHS - calcH)) ) {	
+	if ( (fabs(dHA - calcH) < fabs(dHB - calcH)) && (fabs(dHA - calcH) < fabs(dHS - calcH)) )
+	{	
 		dHC = dHA;																				  
 	}																							   
-	else if (fabs(dHB - calcH) < fabs(dHS - calcH)) {	
+	else if (fabs(dHB - calcH) < fabs(dHS - calcH))
+	{	
 		dHC = dHB;
 	}
-	else {
+	else
+	{
 		dHC = dHS;
 	}
 /*
 	//don't attempt to correct heading if less than 5 degrees off, just move
-	if (fabs(dHC-calcH) < 5) {
+	if (fabs(dHC-calcH) < 5)
+	{
 		isTurn = false;
 		isMove = true;
 	}
 	//attempt to correct heading while moving if between 5 and 15 degrees off
-	else if (fabs(dHC-calcH) < 10) {
+	else if (fabs(dHC-calcH) < 10)
+	{
 		isTurn = true;
 		isMove = true;
 	}
@@ -199,7 +210,8 @@ void do_pid() {
 	isMove = fabs(dHC-calcH) < 15;
 	//if too far off then don't move, just turn
 	/*
-	else {
+	else
+	{
 		isTurn = true;
 		isMove = false;
 	}
@@ -217,11 +229,13 @@ void do_pid() {
 	update_motors(hpid, dpid, ppid);
 }
 
-void get_compass() {
+void get_compass()
+{
 
 }
 
-void update_motors(float hpid, float dpid, float ppid) {
+void update_motors(float hpid, float dpid, float ppid)
+{
 	float motorSpeed[4];
 	float forwardPower, pitchPower;
 
@@ -233,26 +247,31 @@ void update_motors(float hpid, float dpid, float ppid) {
 	forwardPower = (100 - desPower) * 0.02f * (1/(fabs(3*hpid)+1));//(1 - fabs(hpid));
 	pitchPower = ppid * (1/(fabs(dpid/4)+1));
 	//right motor is more powerful than left, back motor is runs in reverse of the others
-	if (isMove && isTurn) {
+	if (isMove && isTurn)
+	{
 		motorSpeed[LEFT] = hpid + forwardPower;
 		motorSpeed[RIGHT] = -hpid + forwardPower;
 	}
-	else if (isTurn) {
+	else if (isTurn)
+	{
 		motorSpeed[LEFT] = hpid;
 		motorSpeed[RIGHT] = -hpid;
 	}
-	else {  // isMove && !isTurn
+	else
+	{  // isMove && !isTurn
 		motorSpeed[LEFT] = forwardPower;
 		motorSpeed[RIGHT] = forwardPower;
 	}
 	
-	if (isPitch) {
+	if (isPitch)
+	{
 		//signs probably arent correct
 		motorSpeed[FRONT] = dpid - pitchPower;
 		motorSpeed[BACK] = dpid +  pitchPower;
 	}
 	//should never be used cuz assume always pitched
-	else {
+	else
+	{
 		motorSpeed[FRONT] = dpid;
 		motorSpeed[BACK] = dpid;
 	}
@@ -264,17 +283,21 @@ void update_motors(float hpid, float dpid, float ppid) {
 	motorSpeed[BACK] *= BACK_MULTIPLIER;
 	//motorSpeed[FRONT] *= .7;	//the front motor is new
 	//motorSpeed is a number around zero so the following scales them 0 - 254 which the motors require
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++)
+	{
 		powerNum[i] = motorSpeed[i] * 56;
-		if (powerNum[i] < 0) {
+		if (powerNum[i] < 0)
+		{
 			powerNum[i] += 106;
 			if (powerNum[i] < 0) powerNum[i] = 0;
 		}
-		else if (powerNum[i] > 0) {
+		else if (powerNum[i] > 0)
+		{
 			powerNum[i] += 148;
 			if (powerNum[i] > 254) powerNum[i] = 254;
 		}
-		else {
+		else
+		{
 			powerNum[i] = 127;
 		}
 	}
@@ -316,7 +339,8 @@ void update_motors(float hpid, float dpid, float ppid) {
 	
 }
 
-void give_data(int accx, int accy, int accz, int gyrx, int gyry, int gyrz) {
+void give_data(int accx, int accy, int accz, int gyrx, int gyry, int gyrz)
+{
 	accX = accx;
 	accY = accy;
 	accZ = accz;

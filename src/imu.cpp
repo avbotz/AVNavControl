@@ -1,7 +1,8 @@
 #include "mbed.h"
 #include "imu.h"
 
-IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
+IMU::IMU(PinName tx, PinName rx, int baud, PC* pc)
+{
 	// Save a pointer to the PC for debugging use.
 	p_pc = pc->p_device;
 	p_device = new Serial(tx, rx);
@@ -11,14 +12,15 @@ IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
 	
 	// Calibration variables
 	calibrationEnabled = false;
-	
+
 	accX = accY = accZ = gyrX = gyrY = gyrZ = magX = magY = magZ = 0;
 	parseNow = false;
 	
 	//intialize the buffers
 	rx_buffer = new CircularBuffer(IMU_RX_BUFFER_SIZE);
 	
-	for (int i = 0; i < 1024; i++) {
+	for (int i = 0; i < 1024; i++)
+	{
 		linebuf[i] = 0;
 	}
 	i_linebuf = 0;
@@ -31,22 +33,27 @@ IMU::IMU(PinName tx, PinName rx, int baud, PC* pc) {
 	p_device->putc('4');
 }
 
-IMU::~IMU() {
-	if (p_device != NULL) {
+IMU::~IMU()
+{
+	if (p_device != NULL)
+	{
 		delete p_device; // prevents memory leaks
 	}
 	delete rx_buffer;
 }
 
 //Wrapper function to write a character to the IMU
-void IMU::putc(char c) {
+void IMU::putc(char c)
+{
 	p_device->putc(c);
 }
 
 // Checks data integrity of buffer, then stores the IMU values into variables.
-void IMU::parse() {
+void IMU::parse()
+{
+	// Null terminate the buffer just in case (for string safety)
 	linebuf[i_linebuf] = '\0';
-	//print_serial(p_pc, buf);
+	
 	short temp[9];
 	// Check data integrity of sscanf()'s results. sscanf() returns the number
 	// of values that it was able to extract. In this case, there are 9 values
@@ -71,34 +78,39 @@ void IMU::parse() {
 }
 
 
-bool IMU::readable() {
+bool IMU::readable()
+{
 	return p_device->readable();
 }
 
-void IMU::getData() {
+void IMU::getData()
+{
 	// While there is data to be read, or the buffer has overflowed.
-	while (!rx_buffer->empty || rx_buffer->overflow) {
+	while (!rx_buffer->empty || rx_buffer->overflow)
+	{
+		// Throw a char into the buffer
 		linebuf[i_linebuf++] = rx_buffer->readByte();
-		if (linebuf[i_linebuf - 1] == '#') {
+		led4 = !led4;
+		// If we reached the end of a set of IMU data (by receiving '#')
+		if (linebuf[i_linebuf - 1] == '#')
+		{
 			//terminate the string
 			linebuf[i_linebuf] = '\0';
 			parseNow = true;
 			break;
 		}
-		led4 = !led4;
 	}
 	
 	NVIC_EnableIRQ(UART3_IRQn);
 	
-	if (parseNow) {
+	if (parseNow)
+	{
 		parse();
-		
-		/*
-		 * IMU Calibration Code
-		 * Calculates the average values of all sensors in order to set biases. 
-		 * The IMU should be flat when you run this code.
-		 */
-		if (calibrationEnabled) {
+
+		// The IMU should be flat when you run this calibration.
+		// Calculates the average values of all sensors in order to set biases.
+		if (calibrationEnabled)
+		{
 			sumAccX += accX;
 			sumAccY += accY;
 			sumAccZ += accZ;
@@ -122,33 +134,37 @@ void IMU::getData() {
 }
 
 // Call to get direct (raw) access to the IMU when it screws itself up.
-void IMU::directAccess() {
+void IMU::directAccess()
+{
 	// Disable the interrupt for reading from the IMU
 	NVIC_DisableIRQ(UART3_IRQn);
 	
 	p_pc->printf("Entering IMU direct access mode. To exit, you need to reset the mbed.\n\r");
 	
 	// Act as a passthrough between the IMU and the PC (BeagleBoard).
-	while (true) {
+	while (true)
+	{
 		// Send a character from PC to IMU (if possible).
-		if (p_pc->readable()) {
+		if (p_pc->readable())
+		{
 			p_device->putc(p_pc->getc());
 		}
 		// Send a character from IMU to PC (if possible).
-		if (p_device->readable()) {
+		if (p_device->readable())
+		{
 			p_pc->putc(p_device->getc());
 		}
 	}
 }
 
-void IMU::setCalibrationEnabled(bool isEnabled) {
+void IMU::setCalibrationEnabled(bool isEnabled)
+{
 	calibrationEnabled = isEnabled;
 	// If we're turning calibration on, clear the variables that stored the old
 	// calibration data.
-	if (isEnabled) {
+	if (isEnabled)
+	{
 		sumAccX = sumAccY = sumAccZ = sumGyrX = sumGyrY = sumGyrZ = sumMagX = sumMagY = sumMagZ = num = 0;
-		minGyrX = minGyrY = minGyrZ = INT_MAX;
-		maxGyrX = maxGyrY = maxGyrZ = -INT_MAX;
 	}
 }
 
@@ -157,12 +173,15 @@ void rx_interrupt_imu()
 	// Indicate that the interrupt was called.
 	led2 = !led2;
 	
-	while (imu.p_device->readable()) {
+	// While there are characters to be read from the IMU
+	while (imu.p_device->readable())
+	{
 		//pc.putc(imu.buffer[imu.i_buffer_write]);
 		NVIC_DisableIRQ(UART3_IRQn);
 		imu.rx_buffer->writeByte(imu.p_device->getc());
 		NVIC_EnableIRQ(UART3_IRQn);
-		if (imu.rx_buffer->overflow) {
+		if (imu.rx_buffer->overflow)
+		{
 			NVIC_DisableIRQ(UART3_IRQn);
 			break;
 		}

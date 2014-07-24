@@ -7,7 +7,8 @@
 #include "pid.h"
 #include "defs.h"
 
-struct avnav {
+struct avnav
+{
 	char byte1;
 	char byte2;
 };
@@ -16,7 +17,8 @@ void rx_interrupt_pc();
 void tx_interrupt_pc();
 void send_status_pc();
 
-class PC {
+class PC
+{
 public:
 	PC(PinName tx, PinName rx, int baud);
 

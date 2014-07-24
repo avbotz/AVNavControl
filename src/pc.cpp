@@ -41,7 +41,8 @@ PC::PC(PinName tx, PinName rx, int baud)
 // byte is a command or data. Downside is that the data is less human-readable,
 // but it's not like the BeagleBoard is a person or sentient being.
 
-avnav PC::encode_avnav(int data) {
+avnav PC::encode_avnav(int data)
+{
 	avnav encoded;
 	
 	data &= 0x3fff;
@@ -51,7 +52,8 @@ avnav PC::encode_avnav(int data) {
 	return encoded;
 }
 
-int PC::decode_avnav(avnav data) {
+int PC::decode_avnav(avnav data)
+{
 	return ((data.byte1 - 0x20) << 6) | (data.byte2 - 0x20);
 }
 
@@ -59,24 +61,23 @@ void send_status_pc()
 {
 	avnav avnav_temp;
 
-	// Construct the message to the BeagleBoard based on state of the sub.
-	// get heading value
+	// Construct the message to the computer based on state of the sub.
+	// get & encode heading value
 	avnav_temp = pc.encode_avnav(calcH);	//back motor
 	pc.mes[1] = avnav_temp.byte1;
 	pc.mes[2] = avnav_temp.byte2;
 	
-	// get depth (pressure sensor) value
+	// depth (pressure sensor)
 	avnav_temp = pc.encode_avnav(depth);	//front motor
 	pc.mes[4] = avnav_temp.byte1;
 	pc.mes[5] = avnav_temp.byte2;
 	
-	// get power (motor) value
+	// power (motor)
 	avnav_temp = pc.encode_avnav(desPower);
 	pc.mes[7] = avnav_temp.byte1;
 	pc.mes[8] = avnav_temp.byte2;
 	
-	// get kill switch value
-	// TODO: is this correct? I assume voltage on kill pin means alive.
+	// kill switch
 	pc.mes[9] = isAlive ? 'k' : 'l';
 	/*
 				char* tmp;
@@ -90,9 +91,9 @@ void send_status_pc()
 void PC::send_message(const char* message)
 {
 	int i = 0;
-	// Loop until message[i] becomes zero (null) because strings in C are
-	// terminated by a zero/null character.
-	while (message[i]) {
+	// Loop while the character is not a null terminator
+	while (message[i])
+	{
 		putc(message[i]);
 		i++;
 	}
@@ -121,11 +122,13 @@ void tx_interrupt_pc()
 		}
 	}
 	
-//	while (pc.p_device->writeable() && !pc.tx_buffer->empty) {
+//	while (pc.p_device->writeable() && !pc.tx_buffer->empty)
+//	{
 //		pc.p_device->putc(pc.tx_buffer->readByte());
 //	}
 
-	if (pc.tx_buffer->empty) {
+	if (pc.tx_buffer->empty)
+	{
 	//	NVIC_DisableIRQ(UART0_IRQn);
 		// if nothing to write, turn off the interrupt until motor.getc() is called again
 	}
@@ -133,11 +136,13 @@ void tx_interrupt_pc()
 
 void rx_interrupt_pc()
 {
-	while (pc.p_device->readable()) {
+	while (pc.p_device->readable())
+	{
 		NVIC_DisableIRQ(UART0_IRQn);
 		pc.rx_buffer->writeByte(pc.p_device->getc());
 		NVIC_EnableIRQ(UART0_IRQn);
-		if (pc.rx_buffer->overflow) {
+		if (pc.rx_buffer->overflow)
+		{
 	//		NVIC_DisableIRQ(UART0_IRQn);
 			break;
 		}
@@ -149,10 +154,18 @@ void rx_interrupt_pc()
 //otherwise it reads characters and updates the desired stuff
 char PC::readPC()
 {
-	if (debug) {
-		if (rx_buffer->empty) return 0;
-		else return rx_buffer->readByte();
+	if (debug)
+	{
+		if (rx_buffer->empty)
+		{
+			return 0;
+		}
+		else
+		{
+			return rx_buffer->readByte();
+		}
 	}
+	
 	while (rx_buffer->hasData(4) &&
 			!rx_buffer->peek(3) == '\n')
 	{
@@ -162,12 +175,12 @@ char PC::readPC()
 	
 	NVIC_DisableIRQ(UART0_IRQn);
 	while ((rx_buffer->hasData(4) &&		//make sure there are 4 characters to be read 
-			rx_buffer->peek(3) == '\n'))// ||	//and the fourth character is a newline
-		//	rx_buffer->overflow)
+			rx_buffer->peek(3) == '\n'))	//and the fourth character is a newline
 	{
 		
 		avnav temp;
-		switch (rx_buffer->readByte()) {
+		switch (rx_buffer->readByte())
+		{
 			//read 2 bytes, process them, and set the right variables
 			//the last increment skips the newline
 		case 'h':
