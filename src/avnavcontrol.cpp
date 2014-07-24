@@ -13,8 +13,14 @@ void pid_tuning_mode();
 LocalFileSystem local("local");
 char mode, which_pid;
 
+int desDropper(0);
+int prevDropper(0);
+Timeout dropperTicker;
+void dropper_callback();
+
 int main()
 {
+	dropperRelay = 1;
 	init_pid();
 	
 	FILE* config = fopen("/local/config", "r");
@@ -68,6 +74,16 @@ int main()
 			desHead = pc.desired_heading;
 			desPower = pc.desired_power;
 			desDepth = pc.desired_depth;
+			desDropper = pc.desired_dropper;
+
+			// Check if we need to drop something
+			if(prevDropper != desDropper)
+			{
+				prevDropper = desDropper;
+				dropperRelay = 0;
+				dropperTicker.attach(&dropper_callback, 3.0f);
+			}
+			
 			give_data(imu.accX, imu.accY, imu.accZ, imu.gyrX, imu.gyrY, imu.gyrZ);
 			for (int i = 0; i < 4; i++) {
 				motor.set(i, motorArray[i]);
@@ -393,4 +409,9 @@ void print_status()
 	sprintf(buff, "%d\n", error);
 	pc.send_message(buff);
 	tx_interrupt_pc();
+}
+
+void dropper_callback()
+{
+	dropperRelay = 1;
 }
