@@ -51,8 +51,8 @@
 
 // motor multipliers
 #define RIGHT_MULTIPLIER .848 // right is stronger
-#define FRONT_MULTIPLIER 1
+#define FRONT_MULTIPLIER 0.75
 #define LEFT_MULTIPLIER 1
-#define BACK_MULTIPLIER -.8 // back is backwards and stronger
+#define BACK_MULTIPLIER -1 // back is backwards and stronger
 
 #endif
