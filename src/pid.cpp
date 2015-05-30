@@ -63,6 +63,12 @@ void reset_pid()
 
 void init_pid()
 {
+	if (pitchPID != NULL)
+	{
+		delete pitchPID;
+		delete headingPID;
+		delete depthPID;
+	}
 	pitchPID = new PID();
 	headingPID = new PID();
 	depthPID = new PID();

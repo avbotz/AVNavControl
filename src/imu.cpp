@@ -147,7 +147,14 @@ void IMU::directAccess()
 		// Send a character from PC to IMU (if possible).
 		if (p_pc->readable())
 		{
-			p_device->putc(p_pc->getc());
+			char in = p_pc->getc();
+			if (in == 'q')
+			{
+				NVIC_EnableIRQ(UART3_IRQn);
+				return;
+			}
+			
+			p_device->putc(in);
 		}
 		// Send a character from IMU to PC (if possible).
 		if (p_device->readable())

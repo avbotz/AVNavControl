@@ -29,6 +29,11 @@ int main()
 	if (mode == 'P')
 	{
 		which_pid = fgetc(config);
+		pc.desired_state = which_pid;
+	}
+	if (mode == 'D')
+	{
+		pc.desired_state = 1;
 	}
 	fclose(config);
 	//attach the pc interrupts
@@ -43,6 +48,7 @@ int main()
 	
 	//create the tickers here
 	Ticker tick[5];
+
 	if (!debug)
 	{
 		tick[0].attach(&send_status_pc, 0.1);
@@ -54,6 +60,48 @@ int main()
 	
 	while (true)
 	{
+		switch (pc.desired_state)
+		{
+		case 0:
+			mode = 'R';
+			if (debug)
+			{
+				debug = false;
+				tick[0].attach(&send_status_pc, 0.1);
+				tick[1].detach();
+				tick[2].detach();
+				tick[3].detach();
+				init_pid();
+				tick[1].attach(&do_pid, DT);
+				tick[2].attach(&motor_send_wrapper, DT);
+				tick[3].attach(&updateKill, DT);	//cannot run faster than PID so that PID knows when to reset
+			}
+			break;
+		case 1:
+			mode = 'D';
+			debug = true;
+			tick[0].detach();
+			break;
+		case 2:
+			mode = 'P';
+			debug = true;
+			tick[0].detach();
+			which_pid = 'p';
+			break;
+		case 3:
+			mode = 'P';
+			debug = true;
+			tick[0].detach();
+			which_pid = 'd';
+			break;
+		case 4:
+			mode = 'P';
+			debug = true;
+			tick[0].detach();
+			which_pid = 'h';
+			break;
+		}
+		pc.desired_state = 0;
 		
 		if (!motor.isTxEmpty()) {
 			tx_interrupt_motor();
@@ -67,6 +115,7 @@ int main()
 		
 		imu.getData();
 		
+
 		// If we are running in normal (AKA production or competition) mode.
 		if (!debug)
 		{
@@ -135,10 +184,11 @@ void debug_mode()
 		case 'p':
 			pressure_info();
 			break;
-			
 		case '\0':
 			break;
-				
+		case 'q':
+			mode = 'R';
+			return;
 		default:	// The user typed a key we didn't understand.
 			pc.send_message("Unrecognized command.\n\r");
 			if (!pc.isTxEmpty())
@@ -173,6 +223,7 @@ void imu_calibration()
 		// Get data every 10 ms.
 		if (!(timeElapsed % 10))
 		{
+			tx_interrupt_pc();
 			imu.getData();
 		}
 		// If the time is a multiple of 1000 ms and we haven't already printed at this time.
@@ -229,6 +280,12 @@ void kill_info()
 		pc.send_message(killinfo);
 		// Make it flush the PC buffer.
 		tx_interrupt_pc();
+		char in = pc.readPC();
+		if (in == 'q')
+		{
+			mode = 'R';
+			return;
+		}
 		// Wait 1s between each message.
 		wait_ms(100);
 	}
@@ -255,6 +312,12 @@ void pressure_info()
 			pc.send_message(pressinfo);
 			tx_interrupt_pc();
 			average = 0;
+		}
+		char in = pc.readPC();
+		if (in == 'q')
+		{
+			mode = 'R';
+			return;
 		}
 		wait_ms(50);
 	}
@@ -311,9 +374,11 @@ void pid_tuning_mode()
 		case 's':	//set setpoint
 			set_setpoint();
 			break;
-				
 		case '\0':
 			break;
+		case 'q':
+			mode = 'R';
+			return;
 		}
 		tx_interrupt_pc();
 	}

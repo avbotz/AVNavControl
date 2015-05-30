@@ -30,7 +30,7 @@ public:
 
 	char readPC();
 
-	int desired_heading, desired_depth, desired_power, desired_dropper;
+	int desired_heading, desired_depth, desired_power, desired_dropper, desired_state;
 
 	Serial* p_device;
 	Ticker* pc_ticker;

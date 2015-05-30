@@ -7,6 +7,7 @@ PC::PC(PinName tx, PinName rx, int baud)
 	desired_heading = 0;
 	desired_depth = 20;
 	desired_dropper = 0;
+	desired_state = 0;
 	p_device = new Serial(tx, rx);
 	p_device->baud(baud);
 	
@@ -203,6 +204,12 @@ char PC::readPC()
 			temp.byte1 = rx_buffer->readByte();
 			temp.byte2 = rx_buffer->readByte();
 			desired_dropper = decode_avnav(temp);
+			break;
+		case 's':
+			temp.byte1 = rx_buffer->readByte();
+			temp.byte2 = rx_buffer->readByte();
+			desired_state = decode_avnav(temp);
+			pc.send_message("mode change");
 			break;
 		}
 		rx_buffer->readByte();	//advance past the newline

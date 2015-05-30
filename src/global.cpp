@@ -31,11 +31,11 @@ AnalogPressureSensor pressure(p17, 435.19, -85.85);
 PC pc(USBTX, USBRX, 115200); //tx, rx
 
 //IMU.h
-// pins 9, 10 = UART 3
-IMU imu(p9, p10, 57600, &pc);
+// pins 13, 14 = UART 3
+IMU imu(p13, p14, 57600, &pc);
 
 //motor.h
-// pins 13, 14 = UART 1
+// pins 28, 27 = UART 1
 Motor motor(4, 9600, p28, p27);
 
 DigitalOut led1(LED1), // Kill status. On means alive.
