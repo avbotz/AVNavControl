@@ -67,14 +67,16 @@ int main()
 			if (debug)
 			{
 				debug = false;
-				tick[0].attach(&send_status_pc, 0.1);
 				tick[1].detach();
 				tick[2].detach();
 				tick[3].detach();
+				tick[4].detach();
 				init_pid();
+				tick[0].attach(&send_status_pc, 0.1);
 				tick[1].attach(&do_pid, DT);
 				tick[2].attach(&motor_send_wrapper, DT);
 				tick[3].attach(&updateKill, DT);	//cannot run faster than PID so that PID knows when to reset
+				tick[4].attach(&updatePressure, 0.1);
 			}
 			break;
 		case 1:
@@ -154,6 +156,7 @@ int main()
 }
 
 void imu_calibration();
+void motor_multiplier();
 void imu_direct_access();
 void kill_info();
 void pressure_info();
@@ -181,6 +184,10 @@ void debug_mode()
 			kill_info();
 			break;
 		
+		case 'm':
+			motor_multiplier();
+			break;
+
 		case 'p':
 			pressure_info();
 			break;
@@ -261,6 +268,103 @@ void imu_calibration()
 	// Tell the IMU to stop sending calibration.
 	imu.setCalibrationEnabled(false);
 	delete time;
+}
+
+void motor_multiplier()
+{
+	pc.send_message("Set motor multipliers\r\n");
+	tx_interrupt_pc();
+	// Loop until the calibration time is exceeded.
+	char in;
+	char motorNum;
+	bool done = false;
+	float multiplier[4];
+	char motorUpdateMsg[30];
+
+	FILE* motor_multiplier_file = fopen("/local/MOTORS", "r");
+	fscanf(
+	 motor_multiplier_file,
+	 "\t%f\t%f\t%f\t%f\r\n",
+	 &multiplier[RIGHT], &multiplier[FRONT], &multiplier[LEFT], &multiplier[BACK]
+	);
+	fclose(motor_multiplier_file);
+
+	while (true)
+	{
+		// Get the character from the PC.
+		motorNum = pc.readPC();
+		switch (motorNum)
+		{
+		case 'r':
+		case 'f':
+		case 'l':
+		case 'b':
+			sprintf(motorUpdateMsg, "Changing motor %c from\r\n", motorNum);
+			pc.send_message(motorUpdateMsg);
+			tx_interrupt_pc();
+			while (true)
+			{
+				in = pc.readPC();
+				if ((in > 0) && (in < 202))
+				{
+					switch (motorNum)
+					{
+					case 'r':
+						multiplier[RIGHT] = (in-101)/100.0;
+						break;
+						
+					case 'f':
+						multiplier[FRONT] = (in-101)/100.0;
+						break;
+							
+					case 'l':
+						multiplier[LEFT] = (in-101)/100.0;
+						break;
+					
+					case 'b':
+						multiplier[BACK] = (in-101)/100.0;
+						break;
+					}
+					break;
+				}
+			}
+			break;
+
+		case '\0':
+			break;
+		case 'q':
+			done = true;
+			break;
+		default:	// The user typed a key we didn't understand.
+			pc.send_message("Unrecognized command.\n\r");
+			if (!pc.isTxEmpty())
+			{
+				tx_interrupt_pc();
+			}
+			break;
+		}
+		if (done)
+		{
+			break;
+		}
+	}
+	// String to store the information message for PC.
+	char multiplier_message[200];
+	// Print a formatted message to the string.
+	sprintf(
+	 multiplier_message,
+	 "\t%f\t%f\t%f\t%f\r\n",
+	 multiplier[RIGHT], multiplier[FRONT], multiplier[LEFT], multiplier[BACK]
+	);
+
+	//Write the multiplier message to a log file.
+	FILE* multiplier_file = fopen("/local/MOTORS", "w");
+	fprintf(multiplier_file, "%s", multiplier_message);
+	fclose(multiplier_file);	
+
+	// Safely send the string to the PC.
+	pc.send_message(multiplier_message);
+	tx_interrupt_pc();
 }
 
 void imu_direct_access()

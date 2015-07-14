@@ -36,7 +36,7 @@ IMU imu(p13, p14, 57600, &pc);
 
 //motor.h
 // pins 28, 27 = UART 1
-Motor motor(4, 9600, p28, p27);
+Motor motor(4, 9600, p9, p10);
 
 DigitalOut led1(LED1), // Kill status. On means alive.
            led2(LED2), // IMU: toggled when a character is received.

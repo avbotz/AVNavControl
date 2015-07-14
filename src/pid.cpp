@@ -44,6 +44,8 @@ extern LocalFileSystem local;
 int pid_loops_since_alive = 0;
 float pressure_average = 0;
 
+float MOTOR_MULTIPLIER[4];
+
 void reset_pid()
 {
 	pitchPID->reset();
@@ -116,6 +118,14 @@ void init_pid()
 	 &MU_X_COM, &MU_Y_COM, &MU_Z_COM 
 	);
 	fclose(calibration_file);
+
+	FILE* motor_multiplier_file = fopen("/local/MOTORS", "r");
+	fscanf(
+	 calibration_file,
+	 "\t%f\t%f\t%f\t%f\r\n",
+	 &MOTOR_MULTIPLIER[RIGHT], &MOTOR_MULTIPLIER[FRONT], &MOTOR_MULTIPLIER[LEFT], &MOTOR_MULTIPLIER[BACK]
+	);
+	fclose(motor_multiplier_file);
 
 	MU_Z_ACC -= 256.0f;
 
@@ -283,10 +293,10 @@ void update_motors(float hpid, float dpid, float ppid)
 	}
 	
 	int powerNum[4];
-	motorSpeed[RIGHT] *= RIGHT_MULTIPLIER;
-	motorSpeed[FRONT] *= FRONT_MULTIPLIER;
-	motorSpeed[LEFT] *= LEFT_MULTIPLIER;
-	motorSpeed[BACK] *= BACK_MULTIPLIER;
+	motorSpeed[RIGHT] *= MOTOR_MULTIPLIER[RIGHT];
+	motorSpeed[FRONT] *= MOTOR_MULTIPLIER[FRONT];
+	motorSpeed[LEFT] *= MOTOR_MULTIPLIER[LEFT];
+	motorSpeed[BACK] *= MOTOR_MULTIPLIER[BACK];
 	//motorSpeed[FRONT] *= .7;	//the front motor is new
 	//motorSpeed is a number around zero so the following scales them 0 - 254 which the motors require
 	for (int i = 0; i < 4; i++)

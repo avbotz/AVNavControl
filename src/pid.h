@@ -31,6 +31,8 @@ extern bool debug;
 extern volatile bool isAlive, isAlivePrev;
 
 extern unsigned char motorArray[4];
+extern float MOTOR_MULTIPLIER[4];
+
 extern AnalogKillSwitch kill;
 
 void reset_pid();

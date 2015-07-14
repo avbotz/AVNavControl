@@ -209,7 +209,7 @@ char PC::readPC()
 			temp.byte1 = rx_buffer->readByte();
 			temp.byte2 = rx_buffer->readByte();
 			desired_state = decode_avnav(temp);
-			pc.send_message("mode change");
+			pc.send_message("mode change\n");
 			break;
 		}
 		rx_buffer->readByte();	//advance past the newline
